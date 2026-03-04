@@ -2,23 +2,21 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
 import { BookOpen, ClipboardCheck, Trophy, Target, Flame, ChevronRight } from "lucide-react";
-import BottomNav from "@/components/BottomNav";
+import PageShell from "@/components/PageShell";
 import logo from "@/assets/logo.png";
 
 const Home = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Calculate stats from history
   const history = JSON.parse(localStorage.getItem("mdcat_history") || "[]")
     .filter((h: any) => h.username === user?.username);
-  
+
   const totalQuizzes = history.length;
   const totalCorrect = history.reduce((acc: number, h: any) => acc + h.correct, 0);
   const totalQuestions = history.reduce((acc: number, h: any) => acc + h.total, 0);
   const accuracy = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0;
 
-  // Simple streak calc
   const streak = (() => {
     if (history.length === 0) return 0;
     const dates = [...new Set(history.map((h: any) => new Date(h.date).toDateString() as string))].sort(
@@ -47,12 +45,12 @@ const Home = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <PageShell>
       {/* Header */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-primary/80" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,hsl(var(--primary-foreground)/0.08),transparent_50%)]" />
-        
+
         <div className="relative px-5 pt-12 pb-8">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
@@ -76,7 +74,6 @@ const Home = () => {
             </h1>
           </motion.div>
 
-          {/* Stats Row */}
           <motion.div
             className="flex gap-3 mt-6"
             initial={{ opacity: 0, y: 15 }}
@@ -86,10 +83,7 @@ const Home = () => {
             {stats.map((s) => {
               const Icon = s.icon;
               return (
-                <div
-                  key={s.label}
-                  className="flex-1 bg-primary-foreground/10 backdrop-blur-sm rounded-2xl p-3 text-center"
-                >
+                <div key={s.label} className="flex-1 bg-primary-foreground/10 backdrop-blur-sm rounded-2xl p-3 text-center">
                   <Icon size={18} className="text-primary-foreground/80 mx-auto mb-1" />
                   <p className="text-xl font-bold font-display text-primary-foreground">{s.value}</p>
                   <p className="text-[10px] font-medium text-primary-foreground/60 uppercase tracking-wider">{s.label}</p>
@@ -129,7 +123,7 @@ const Home = () => {
       </div>
 
       {/* Recent Activity */}
-      <div className="px-5 mt-6">
+      <div className="px-5 mt-6 pb-4">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-base font-bold font-display text-foreground">Recent Activity</h2>
           <button onClick={() => navigate("/history")} className="text-xs text-primary font-semibold flex items-center gap-0.5">
@@ -171,9 +165,7 @@ const Home = () => {
           )}
         </motion.div>
       </div>
-
-      <BottomNav />
-    </div>
+    </PageShell>
   );
 };
 
