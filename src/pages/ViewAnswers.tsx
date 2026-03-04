@@ -1,5 +1,8 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, Check, X } from "lucide-react";
+import { motion } from "framer-motion";
+
+const optionLetters = ["A", "B", "C", "D"];
 
 const ViewAnswers = () => {
   const location = useLocation();
@@ -13,44 +16,62 @@ const ViewAnswers = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="flex items-center gap-3 px-6 pt-6 pb-4 sticky top-0 bg-background z-10">
-        <button onClick={() => navigate(-1)}>
-          <ArrowLeft size={24} />
-        </button>
-        <h1 className="text-xl font-extrabold">Answers Review</h1>
+      <div className="px-5 pt-12 pb-4 sticky top-0 bg-background/90 backdrop-blur-xl z-10 border-b border-border/50">
+        <div className="flex items-center gap-3">
+          <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-xl bg-card border border-border flex items-center justify-center">
+            <ArrowLeft size={18} />
+          </button>
+          <h1 className="text-lg font-bold font-display">Answers Review</h1>
+        </div>
       </div>
 
-      <div className="px-6 pb-8 space-y-6">
+      <motion.div
+        className="px-5 py-4 space-y-4 pb-8"
+        initial="hidden"
+        animate="show"
+        variants={{ hidden: {}, show: { transition: { staggerChildren: 0.03 } } }}
+      >
         {questions.map((q: any, i: number) => {
           const isCorrect = answers[i] === q.correctAnswer;
           return (
-            <div key={q.id} className="border border-border rounded-2xl p-4">
-              <p className="font-bold mb-3">
-                <span className="text-muted-foreground mr-2">Q{i + 1}.</span>
-                {q.question}
-              </p>
-              <div className="space-y-2">
+            <motion.div
+              key={q.id}
+              className="glass-card p-4"
+              variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
+            >
+              <div className="flex items-start gap-2 mb-3">
+                <span className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 text-xs font-bold ${
+                  isCorrect ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"
+                }`}>
+                  {isCorrect ? <Check size={14} /> : <X size={14} />}
+                </span>
+                <p className="font-semibold text-sm text-foreground leading-relaxed">{q.question}</p>
+              </div>
+              <div className="space-y-1.5 ml-8">
                 {q.options.map((opt: string, j: number) => {
                   const isSelected = answers[i] === j;
                   const isAnswer = q.correctAnswer === j;
                   return (
                     <div
                       key={j}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold ${
-                        isAnswer ? "bg-success/10 text-success" : isSelected && !isAnswer ? "bg-destructive/10 text-destructive" : ""
+                      className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium ${
+                        isAnswer
+                          ? "bg-success/10 text-success"
+                          : isSelected && !isAnswer
+                          ? "bg-destructive/10 text-destructive"
+                          : "text-muted-foreground"
                       }`}
                     >
-                      {isAnswer && <Check size={16} />}
-                      {isSelected && !isAnswer && <X size={16} />}
+                      <span className="font-bold">{optionLetters[j]}.</span>
                       <span>{opt}</span>
                     </div>
                   );
                 })}
               </div>
-            </div>
+            </motion.div>
           );
         })}
-      </div>
+      </motion.div>
     </div>
   );
 };

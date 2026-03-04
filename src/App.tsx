@@ -13,6 +13,7 @@ import QuizPlay from "./pages/QuizPlay";
 import Result from "./pages/Result";
 import ViewAnswers from "./pages/ViewAnswers";
 import History from "./pages/History";
+import Dashboard from "./pages/Dashboard";
 import Rules from "./pages/Rules";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/result" element={<Result />} />
             <Route path="/result/answers" element={<ViewAnswers />} />
             <Route path="/history" element={<History />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/rules" element={<Rules />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="*" element={<NotFound />} />
