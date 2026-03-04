@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,81 +6,86 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 230 25% 15%;
+    --background: 220 20% 97%;
+    --foreground: 224 30% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 230 25% 15%;
+    --card-foreground: 224 30% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 230 25% 15%;
+    --popover-foreground: 224 30% 12%;
 
-    --primary: 245 58% 60%;
+    --primary: 239 84% 67%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 20% 96%;
-    --secondary-foreground: 230 25% 15%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 224 30% 12%;
 
-    --muted: 240 15% 95%;
-    --muted-foreground: 230 10% 50%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
 
-    --accent: 245 58% 60%;
+    --accent: 239 84% 67%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 10% 90%;
-    --input: 240 10% 94%;
-    --ring: 245 58% 60%;
-
-    --radius: 1rem;
-
-    --success: 142 71% 45%;
+    --success: 152 76% 36%;
     --success-foreground: 0 0% 100%;
+
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 239 84% 67%;
+
+    --radius: 0.75rem;
+
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 245 58% 60%;
+    --sidebar-primary: 239 84% 67%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 245 58% 60%;
+    --sidebar-ring: 239 84% 67%;
 
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Inter', sans-serif;
   }
 
   .dark {
-    --background: 230 25% 8%;
-    --foreground: 0 0% 95%;
-    --card: 230 25% 12%;
-    --card-foreground: 0 0% 95%;
-    --popover: 230 25% 12%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 245 58% 65%;
+    --background: 224 30% 6%;
+    --foreground: 220 20% 95%;
+    --card: 224 25% 10%;
+    --card-foreground: 220 20% 95%;
+    --popover: 224 25% 10%;
+    --popover-foreground: 220 20% 95%;
+    --primary: 239 84% 67%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 230 20% 18%;
-    --secondary-foreground: 0 0% 95%;
-    --muted: 230 15% 20%;
-    --muted-foreground: 230 10% 60%;
-    --accent: 245 58% 65%;
+    --secondary: 224 20% 14%;
+    --secondary-foreground: 220 20% 95%;
+    --muted: 224 20% 14%;
+    --muted-foreground: 220 9% 55%;
+    --accent: 239 84% 67%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 62% 30%;
     --destructive-foreground: 0 0% 100%;
-    --border: 230 15% 22%;
-    --input: 230 15% 22%;
-    --ring: 245 58% 65%;
-    --sidebar-background: 230 25% 10%;
+    --success: 152 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --border: 224 15% 18%;
+    --input: 224 15% 18%;
+    --ring: 239 84% 67%;
+    --sidebar-background: 224 25% 8%;
     --sidebar-foreground: 0 0% 90%;
-    --sidebar-primary: 245 58% 65%;
+    --sidebar-primary: 239 84% 67%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 230 15% 18%;
+    --sidebar-accent: 224 15% 14%;
     --sidebar-accent-foreground: 0 0% 90%;
-    --sidebar-border: 230 15% 18%;
-    --sidebar-ring: 245 58% 65%;
+    --sidebar-border: 224 15% 18%;
+    --sidebar-ring: 239 84% 67%;
   }
 }
 
@@ -88,7 +93,6 @@
   * {
     @apply border-border;
   }
-
   body {
     @apply bg-background text-foreground antialiased;
   }
@@ -99,38 +103,38 @@
     @apply bg-primary text-primary-foreground;
   }
 
-  .menu-card {
-    @apply bg-card border border-border rounded-2xl p-6 flex items-center gap-4 
-           shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer
-           hover:border-primary/30;
-  }
-
-  .menu-card-active {
-    @apply bg-primary text-primary-foreground border-primary shadow-lg;
-  }
-
-  .menu-card-small {
-    @apply bg-card border border-border rounded-2xl p-5 flex flex-col items-center 
-           justify-center gap-3 shadow-sm hover:shadow-md transition-all duration-200 
-           cursor-pointer hover:border-primary/30;
-  }
-
   .input-field {
-    @apply bg-muted border-0 rounded-xl h-14 px-5 text-base placeholder:text-muted-foreground/60
-           focus-visible:ring-2 focus-visible:ring-primary;
+    @apply bg-muted border border-border rounded-xl h-12 px-4 text-sm
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:border-transparent
+           transition-all duration-200;
   }
 
   .btn-primary {
-    @apply bg-primary text-primary-foreground rounded-xl h-14 text-lg font-bold
-           hover:opacity-90 transition-opacity;
+    @apply bg-primary text-primary-foreground rounded-xl h-12 text-sm font-semibold
+           hover:opacity-90 active:scale-[0.98] transition-all duration-200;
   }
 
-  .option-card {
-    @apply border border-border rounded-xl p-4 flex items-center gap-3 cursor-pointer
-           transition-all duration-200 hover:border-primary/50;
+  .glass-card {
+    @apply bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl shadow-sm;
   }
+}
 
-  .option-card-selected {
-    @apply border-primary bg-primary/5;
-  }
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 999px;
+}
+
+/* Circular progress */
+.circular-progress {
+  transform: rotate(-90deg);
+}
+.circular-progress circle {
+  transition: stroke-dashoffset 1s ease-in-out;
 }

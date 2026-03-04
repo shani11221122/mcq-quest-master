@@ -1,7 +1,15 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, RotateCcw, Eye } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
+import CircularProgress from "@/components/CircularProgress";
+
+const motivationalMessages = [
+  { min: 90, msg: "Outstanding! 🏆", sub: "You're a top performer!" },
+  { min: 70, msg: "Great job! 🎉", sub: "Keep up the excellent work!" },
+  { min: 50, msg: "Good effort! 💪", sub: "You're getting there!" },
+  { min: 0, msg: "Keep practicing! 📚", sub: "Every attempt makes you stronger." },
+];
 
 const Result = () => {
   const location = useLocation();
@@ -14,55 +22,91 @@ const Result = () => {
     return null;
   }
 
-  const stats = [
-    { label: "Subject", value: result.subject, color: "text-primary" },
-    { label: "Correct", value: result.correct, color: "text-success" },
-    { label: "Incorrect", value: result.incorrect, color: "text-destructive" },
-    { label: "Overall Points", value: result.total, color: "text-primary" },
-    { label: "Earned", value: result.correct, color: "text-success" },
-  ];
+  const percentage = Math.round((result.correct / result.total) * 100);
+  const message = motivationalMessages.find((m) => percentage >= m.min)!;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <div className="flex items-center gap-3 px-6 pt-8 pb-4">
-        <button onClick={() => navigate("/home")}>
-          <ArrowLeft size={24} />
+      {/* Header */}
+      <div className="px-5 pt-12 pb-4 flex items-center gap-3">
+        <button
+          onClick={() => navigate("/home")}
+          className="w-9 h-9 rounded-xl bg-card border border-border flex items-center justify-center"
+        >
+          <ArrowLeft size={18} />
         </button>
-        <h1 className="text-2xl font-extrabold">Final Result</h1>
+        <h1 className="text-lg font-bold font-display">Quiz Result</h1>
       </div>
 
-      <motion.div
-        className="px-6 flex-1"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <p className="text-lg font-bold mb-6">
-          {result.correct >= result.total * 0.7 ? "🎉 " : ""}
-          Well Done, {user?.username || "Student"}
-        </p>
+      <div className="flex-1 px-5 flex flex-col items-center">
+        {/* Score Circle */}
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 200, damping: 20 }}
+          className="mt-6"
+        >
+          <CircularProgress
+            value={result.correct}
+            max={result.total}
+            size={160}
+            strokeWidth={10}
+            labelSuffix="%"
+          />
+        </motion.div>
 
-        <div className="space-y-4">
-          {stats.map((s) => (
-            <div key={s.label} className="flex justify-between items-center">
-              <span className="font-bold text-foreground">{s.label} :</span>
-              <span className={`font-extrabold text-lg ${s.color}`}>{s.value}</span>
-            </div>
-          ))}
-        </div>
-      </motion.div>
+        {/* Message */}
+        <motion.div
+          className="text-center mt-6"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <h2 className="text-2xl font-bold font-display">{message.msg}</h2>
+          <p className="text-sm text-muted-foreground mt-1">{message.sub}</p>
+        </motion.div>
 
-      <div className="px-6 pb-8 space-y-3">
+        {/* Stats Grid */}
+        <motion.div
+          className="grid grid-cols-2 gap-3 w-full mt-8"
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <div className="glass-card p-4 text-center">
+            <p className="text-2xl font-bold font-display text-success">{result.correct}</p>
+            <p className="text-xs text-muted-foreground font-medium mt-0.5">Correct</p>
+          </div>
+          <div className="glass-card p-4 text-center">
+            <p className="text-2xl font-bold font-display text-destructive">{result.incorrect}</p>
+            <p className="text-xs text-muted-foreground font-medium mt-0.5">Incorrect</p>
+          </div>
+          <div className="glass-card p-4 text-center">
+            <p className="text-2xl font-bold font-display text-foreground">{result.total}</p>
+            <p className="text-xs text-muted-foreground font-medium mt-0.5">Total</p>
+          </div>
+          <div className="glass-card p-4 text-center">
+            <p className="text-2xl font-bold font-display text-primary capitalize">{result.subject}</p>
+            <p className="text-xs text-muted-foreground font-medium mt-0.5">Subject</p>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Actions */}
+      <div className="px-5 pb-8 space-y-3">
         <button
-          className="btn-primary w-full"
+          className="btn-primary w-full flex items-center justify-center gap-2"
           onClick={() => navigate("/result/answers", { state: { answers, questions, result } })}
         >
+          <Eye size={18} />
           View Answers
         </button>
         <button
-          className="btn-primary w-full opacity-80"
+          className="w-full h-12 rounded-xl border-2 border-border text-foreground text-sm font-semibold flex items-center justify-center gap-2 hover:border-primary/30 transition-colors active:scale-[0.98]"
           onClick={() => navigate(`/quiz/${questions?.[0]?.subject || ""}`)}
         >
-          Start Again
+          <RotateCcw size={18} />
+          Try Again
         </button>
       </div>
     </div>

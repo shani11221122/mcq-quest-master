@@ -1,85 +1,178 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
-import { BookOpen, ClipboardCheck, ScrollText, Clock, KeyRound, LogOut, Hourglass } from "lucide-react";
-
-const menuItems = [
-  { label: "Start Quiz", icon: BookOpen, route: "/quiz", span: "full", color: "text-primary" },
-  { label: "Mockup Test", icon: ClipboardCheck, route: "/quiz", span: "full", color: "text-primary" },
-  { label: "Rules", icon: ScrollText, route: "/rules", span: "half", color: "text-primary" },
-  { label: "History", icon: Clock, route: "/history", span: "half", color: "text-primary" },
-  { label: "Edit Password", icon: KeyRound, route: "#", span: "half", color: "text-primary" },
-  { label: "Logout", icon: LogOut, route: "logout", span: "half", color: "text-primary" },
-  { label: "Up Coming", icon: Hourglass, route: "#", span: "half", color: "text-primary" },
-];
-
-const container = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.06 } },
-};
-
-const item = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0 },
-};
+import { BookOpen, ClipboardCheck, Trophy, Target, Flame, ChevronRight } from "lucide-react";
+import BottomNav from "@/components/BottomNav";
+import logo from "@/assets/logo.png";
 
 const Home = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleClick = (route: string) => {
-    if (route === "logout") {
-      logout();
-      navigate("/login");
-    } else if (route !== "#") {
-      navigate(route);
+  // Calculate stats from history
+  const history = JSON.parse(localStorage.getItem("mdcat_history") || "[]")
+    .filter((h: any) => h.username === user?.username);
+  
+  const totalQuizzes = history.length;
+  const totalCorrect = history.reduce((acc: number, h: any) => acc + h.correct, 0);
+  const totalQuestions = history.reduce((acc: number, h: any) => acc + h.total, 0);
+  const accuracy = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0;
+
+  // Simple streak calc
+  const streak = (() => {
+    if (history.length === 0) return 0;
+    const dates = [...new Set(history.map((h: any) => new Date(h.date).toDateString() as string))].sort(
+      (a: string, b: string) => new Date(b).getTime() - new Date(a).getTime()
+    );
+    let count = 0;
+    const today = new Date();
+    for (let i = 0; i < dates.length; i++) {
+      const d = new Date(dates[i] as string);
+      const diff = Math.floor((today.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
+      if (diff === i || (i === 0 && diff <= 1)) count++;
+      else break;
     }
-  };
+    return count;
+  })();
+
+  const stats = [
+    { icon: Trophy, label: "Quizzes", value: totalQuizzes, color: "text-primary" },
+    { icon: Target, label: "Accuracy", value: `${accuracy}%`, color: "text-success" },
+    { icon: Flame, label: "Streak", value: streak, color: "text-warning" },
+  ];
+
+  const quickActions = [
+    { icon: BookOpen, label: "Start Quiz", desc: "Practice by subject", route: "/quiz", gradient: "from-primary/10 to-primary/5" },
+    { icon: ClipboardCheck, label: "Mock Test", desc: "Full exam simulation", route: "/quiz", gradient: "from-success/10 to-success/5" },
+  ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="auth-header px-6 pt-10 pb-12 rounded-b-[2rem]">
-        <h1 className="text-2xl font-extrabold text-primary-foreground">Home</h1>
-        <p className="text-primary-foreground/80 text-lg mt-2">Hello, {user?.username || "Student"}</p>
-        {user?.isAdmin && (
-          <button
-            onClick={() => navigate("/admin")}
-            className="mt-3 bg-primary-foreground/20 text-primary-foreground px-4 py-1.5 rounded-lg text-sm font-bold"
+    <div className="min-h-screen bg-background pb-20">
+      {/* Header */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-primary/80" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,hsl(var(--primary-foreground)/0.08),transparent_50%)]" />
+        
+        <div className="relative px-5 pt-12 pb-8">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <img src={logo} alt="MDCAT Prep" className="w-9 h-9 rounded-xl bg-primary-foreground/10 p-1" />
+              <span className="text-lg font-bold font-display text-primary-foreground">MDCAT Prep</span>
+            </div>
+            {user?.isAdmin && (
+              <button
+                onClick={() => navigate("/admin")}
+                className="bg-primary-foreground/15 text-primary-foreground px-3 py-1.5 rounded-lg text-xs font-semibold backdrop-blur-sm"
+              >
+                Admin
+              </button>
+            )}
+          </div>
+
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <p className="text-primary-foreground/70 text-sm font-medium">Welcome back</p>
+            <h1 className="text-2xl font-bold font-display text-primary-foreground mt-0.5">
+              {user?.username || "Student"} 👋
+            </h1>
+          </motion.div>
+
+          {/* Stats Row */}
+          <motion.div
+            className="flex gap-3 mt-6"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
           >
-            Admin Panel
-          </button>
-        )}
+            {stats.map((s) => {
+              const Icon = s.icon;
+              return (
+                <div
+                  key={s.label}
+                  className="flex-1 bg-primary-foreground/10 backdrop-blur-sm rounded-2xl p-3 text-center"
+                >
+                  <Icon size={18} className="text-primary-foreground/80 mx-auto mb-1" />
+                  <p className="text-xl font-bold font-display text-primary-foreground">{s.value}</p>
+                  <p className="text-[10px] font-medium text-primary-foreground/60 uppercase tracking-wider">{s.label}</p>
+                </div>
+              );
+            })}
+          </motion.div>
+        </div>
       </div>
 
-      <div className="px-6 pt-8 pb-6">
-        <h2 className="text-xl font-extrabold mb-5">Menu</h2>
-
+      {/* Quick Actions */}
+      <div className="px-5 -mt-3">
         <motion.div
-          className="grid grid-cols-2 gap-4"
-          variants={container}
-          initial="hidden"
-          animate="show"
+          className="grid grid-cols-2 gap-3"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
         >
-          {menuItems.map((m) => {
-            const Icon = m.icon;
-            const isFull = m.span === "full";
+          {quickActions.map((action) => {
+            const Icon = action.icon;
             return (
               <motion.button
-                key={m.label}
-                variants={item}
-                className={`menu-card ${isFull ? "col-span-2" : "menu-card-small"} active:scale-[0.97]`}
-                onClick={() => handleClick(m.route)}
+                key={action.label}
+                className={`glass-card p-4 text-left bg-gradient-to-br ${action.gradient} active:scale-[0.97]`}
+                onClick={() => navigate(action.route)}
                 whileTap={{ scale: 0.97 }}
               >
-                <div className={`${isFull ? "w-14 h-14" : "w-12 h-12"} rounded-full bg-primary/10 flex items-center justify-center`}>
-                  <Icon className={`${m.color} ${isFull ? "w-7 h-7" : "w-6 h-6"}`} />
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-3">
+                  <Icon size={20} className="text-primary" />
                 </div>
-                <span className="font-bold text-base">{m.label}</span>
+                <p className="font-semibold text-sm text-foreground">{action.label}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{action.desc}</p>
               </motion.button>
             );
           })}
         </motion.div>
       </div>
+
+      {/* Recent Activity */}
+      <div className="px-5 mt-6">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-base font-bold font-display text-foreground">Recent Activity</h2>
+          <button onClick={() => navigate("/history")} className="text-xs text-primary font-semibold flex items-center gap-0.5">
+            View all <ChevronRight size={14} />
+          </button>
+        </div>
+
+        <motion.div
+          className="space-y-2"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+        >
+          {history.length === 0 ? (
+            <div className="glass-card p-6 text-center">
+              <p className="text-muted-foreground text-sm">No quizzes taken yet</p>
+              <button onClick={() => navigate("/quiz")} className="text-primary text-sm font-semibold mt-2">
+                Take your first quiz →
+              </button>
+            </div>
+          ) : (
+            history.slice(-3).reverse().map((h: any, i: number) => {
+              const pct = h.total > 0 ? Math.round((h.correct / h.total) * 100) : 0;
+              return (
+                <div key={i} className="glass-card p-3.5 flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold ${
+                    pct >= 70 ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"
+                  }`}>
+                    {pct}%
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm text-foreground capitalize truncate">{h.subject}</p>
+                    <p className="text-xs text-muted-foreground">{h.correct}/{h.total} correct</p>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full capitalize">{h.difficulty}</span>
+                </div>
+              );
+            })
+          )}
+        </motion.div>
+      </div>
+
+      <BottomNav />
     </div>
   );
 };

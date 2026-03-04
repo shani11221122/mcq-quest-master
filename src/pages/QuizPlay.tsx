@@ -1,8 +1,10 @@
 import { useState, useMemo } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getQuestionsBySubject, subjects, type Difficulty } from "@/lib/quiz-data";
+
+const optionLetters = ["A", "B", "C", "D"];
 
 const QuizPlay = () => {
   const { subjectId } = useParams();
@@ -14,7 +16,7 @@ const QuizPlay = () => {
     return getQuestionsBySubject(subjectId || "", difficulty || undefined);
   }, [subjectId, difficulty]);
 
-  const subject = subjects.find(s => s.id === subjectId);
+  const subject = subjects.find((s) => s.id === subjectId);
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [answers, setAnswers] = useState<(number | null)[]>(new Array(questions.length).fill(null));
@@ -22,7 +24,7 @@ const QuizPlay = () => {
   if (questions.length === 0) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6">
-        <p className="text-xl font-bold mb-4">No questions available for this difficulty level.</p>
+        <p className="text-lg font-semibold mb-4">No questions available.</p>
         <button onClick={() => navigate("/quiz")} className="btn-primary px-8">
           Go Back
         </button>
@@ -31,6 +33,7 @@ const QuizPlay = () => {
   }
 
   const q = questions[current];
+  const progress = ((current + 1) / questions.length) * 100;
 
   const handleNext = () => {
     const newAnswers = [...answers];
@@ -41,7 +44,6 @@ const QuizPlay = () => {
       setCurrent(current + 1);
       setSelected(newAnswers[current + 1]);
     } else {
-      // Calculate results
       let correct = 0;
       newAnswers.forEach((a, i) => {
         if (a === questions[i].correctAnswer) correct++;
@@ -54,79 +56,104 @@ const QuizPlay = () => {
         difficulty: difficulty || "all",
         date: new Date().toISOString(),
       };
-      // Save to history
       const history = JSON.parse(localStorage.getItem("mdcat_history") || "[]");
       const user = JSON.parse(localStorage.getItem("mdcat_user") || "{}");
       history.push({ ...result, username: user.username });
       localStorage.setItem("mdcat_history", JSON.stringify(history));
-
       navigate("/result", { state: { result, answers: newAnswers, questions } });
     }
   };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <div className="flex items-center gap-3 px-6 pt-6 pb-2">
-        <button onClick={() => navigate("/quiz")}>
-          <ArrowLeft size={24} />
+      {/* Top bar */}
+      <div className="px-5 pt-12 pb-3 flex items-center gap-3">
+        <button
+          onClick={() => navigate("/quiz")}
+          className="w-9 h-9 rounded-xl bg-card border border-border flex items-center justify-center"
+        >
+          <X size={16} />
         </button>
-        <h1 className="text-lg font-extrabold">{subject?.name || "Quiz"}</h1>
-        {difficulty && (
-          <span className="ml-auto text-xs font-bold bg-primary/10 text-primary px-3 py-1 rounded-full capitalize">
-            {difficulty}
-          </span>
-        )}
+        <div className="flex-1">
+          <p className="text-sm font-semibold text-foreground">{subject?.name || "Quiz"}</p>
+          {difficulty && (
+            <p className="text-[10px] text-muted-foreground capitalize">{difficulty} level</p>
+          )}
+        </div>
+        <div className="bg-card border border-border rounded-xl px-3 py-1.5">
+          <span className="text-xs font-bold text-primary">{current + 1}</span>
+          <span className="text-xs text-muted-foreground">/{questions.length}</span>
+        </div>
       </div>
 
-      {/* Progress */}
-      <div className="px-6 py-2">
-        <div className="h-2 bg-muted rounded-full overflow-hidden">
+      {/* Progress bar */}
+      <div className="px-5 pb-4">
+        <div className="h-1.5 bg-muted rounded-full overflow-hidden">
           <motion.div
             className="h-full bg-primary rounded-full"
-            animate={{ width: `${((current + 1) / questions.length) * 100}%` }}
+            animate={{ width: `${progress}%` }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           />
         </div>
-        <p className="text-sm text-muted-foreground mt-1">{current + 1} / {questions.length}</p>
       </div>
 
-      <div className="flex-1 px-6 py-4 flex flex-col">
+      {/* Question area */}
+      <div className="flex-1 px-5 flex flex-col">
         <AnimatePresence mode="wait">
           <motion.div
             key={current}
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -30 }}
+            transition={{ duration: 0.2 }}
             className="flex-1 flex flex-col"
           >
-            <p className="text-lg font-bold mb-6 leading-relaxed">{q.question}</p>
+            <div className="glass-card p-5 mb-5">
+              <p className="text-base font-semibold leading-relaxed text-foreground">{q.question}</p>
+            </div>
 
             <div className="space-y-3 flex-1">
-              {q.options.map((opt, i) => (
-                <button
-                  key={i}
-                  className={`option-card w-full text-left ${selected === i ? "option-card-selected" : ""}`}
-                  onClick={() => setSelected(i)}
-                >
-                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    selected === i ? "border-primary" : "border-muted-foreground/30"
-                  }`}>
-                    {selected === i && <div className="w-3 h-3 rounded-full bg-primary" />}
-                  </div>
-                  <span className="font-semibold">{opt}</span>
-                </button>
-              ))}
+              {q.options.map((opt, i) => {
+                const isSelected = selected === i;
+                return (
+                  <motion.button
+                    key={i}
+                    className={`w-full flex items-center gap-3 p-4 rounded-2xl border-2 transition-all duration-200 text-left ${
+                      isSelected
+                        ? "border-primary bg-primary/5 shadow-sm"
+                        : "border-border bg-card hover:border-primary/30"
+                    }`}
+                    onClick={() => setSelected(i)}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <div
+                      className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 transition-all duration-200 ${
+                        isSelected
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      {optionLetters[i]}
+                    </div>
+                    <span className={`text-sm font-medium ${isSelected ? "text-foreground" : "text-foreground/80"}`}>
+                      {opt}
+                    </span>
+                  </motion.button>
+                );
+              })}
             </div>
           </motion.div>
         </AnimatePresence>
 
-        <button
-          onClick={handleNext}
-          disabled={selected === null}
-          className="btn-primary w-full mt-6 disabled:opacity-50"
-        >
-          {current === questions.length - 1 ? "Finish" : "Next"}
-        </button>
+        <div className="py-5">
+          <button
+            onClick={handleNext}
+            disabled={selected === null}
+            className="btn-primary w-full disabled:opacity-40"
+          >
+            {current === questions.length - 1 ? "Finish Quiz" : "Next Question"}
+          </button>
+        </div>
       </div>
     </div>
   );
