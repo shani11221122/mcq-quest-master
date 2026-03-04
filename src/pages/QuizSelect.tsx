@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Search } from "lucide-react";
+import { ArrowLeft, Search, Timer, TimerOff } from "lucide-react";
 import { motion } from "framer-motion";
 import { subjects, getQuestionsBySubject } from "@/lib/quiz-data";
 import type { Difficulty } from "@/lib/quiz-data";
@@ -18,6 +18,7 @@ const QuizSelect = () => {
   const navigate = useNavigate();
   const [difficulty, setDifficulty] = useState<Difficulty | "all">("all");
   const [search, setSearch] = useState("");
+  const [timedMode, setTimedMode] = useState(false);
 
   const difficulties: { key: Difficulty | "all"; label: string }[] = [
     { key: "all", label: "All" },
@@ -30,8 +31,15 @@ const QuizSelect = () => {
     s.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Get user history for progress
   const history = JSON.parse(localStorage.getItem("mdcat_history") || "[]");
+
+  const buildUrl = (subjectId: string) => {
+    const params = new URLSearchParams();
+    if (difficulty !== "all") params.set("difficulty", difficulty);
+    if (timedMode) params.set("timed", "true");
+    const qs = params.toString();
+    return `/quiz/${subjectId}${qs ? `?${qs}` : ""}`;
+  };
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -56,13 +64,25 @@ const QuizSelect = () => {
           />
         </div>
 
-        {/* Difficulty Chips */}
-        <div className="flex gap-2">
+        {/* Timed Mode Toggle + Difficulty */}
+        <div className="flex items-center gap-2 mb-3">
+          <button
+            onClick={() => setTimedMode(!timedMode)}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
+              timedMode
+                ? "bg-warning text-warning-foreground shadow-sm"
+                : "bg-card border border-border text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {timedMode ? <Timer size={14} /> : <TimerOff size={14} />}
+            {timedMode ? "Timed" : "No Timer"}
+          </button>
+          <div className="w-px h-6 bg-border" />
           {difficulties.map((d) => (
             <button
               key={d.key}
               onClick={() => setDifficulty(d.key)}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
+              className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
                 difficulty === d.key
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "bg-card border border-border text-muted-foreground hover:text-foreground"
@@ -72,6 +92,16 @@ const QuizSelect = () => {
             </button>
           ))}
         </div>
+
+        {timedMode && (
+          <motion.p
+            className="text-[11px] text-warning font-medium bg-warning/10 px-3 py-2 rounded-xl"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+          >
+            ⏱ Timer mode: 1 minute per question. Quiz auto-submits when time runs out.
+          </motion.p>
+        )}
       </div>
 
       {/* Subject Grid */}
@@ -92,9 +122,7 @@ const QuizSelect = () => {
             <motion.button
               key={s.id}
               className="glass-card p-4 text-left active:scale-[0.97] group"
-              onClick={() =>
-                navigate(`/quiz/${s.id}${difficulty !== "all" ? `?difficulty=${difficulty}` : ""}`)
-              }
+              onClick={() => navigate(buildUrl(s.id))}
               variants={{ hidden: { opacity: 0, y: 15 }, show: { opacity: 1, y: 0 } }}
               whileTap={{ scale: 0.97 }}
             >
@@ -102,7 +130,6 @@ const QuizSelect = () => {
               <p className="font-semibold text-sm text-foreground">{s.name}</p>
               <p className="text-xs text-muted-foreground mt-0.5">{qCount} questions</p>
 
-              {/* Progress bar */}
               <div className="mt-3 h-1.5 bg-muted rounded-full overflow-hidden">
                 <motion.div
                   className="h-full bg-primary rounded-full"
