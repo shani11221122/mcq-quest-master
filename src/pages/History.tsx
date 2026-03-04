@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Clock } from "lucide-react";
-import { motion } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
 import PageShell from "@/components/PageShell";
 
@@ -32,20 +31,11 @@ const History = () => {
             </button>
           </div>
         ) : (
-          <motion.div
-            className="space-y-2.5"
-            initial="hidden"
-            animate="show"
-            variants={{ hidden: {}, show: { transition: { staggerChildren: 0.04 } } }}
-          >
+          <div className="space-y-2.5">
             {history.map((h: any, i: number) => {
               const pct = h.total > 0 ? Math.round((h.correct / h.total) * 100) : 0;
               return (
-                <motion.div
-                  key={i}
-                  className="glass-card p-4 flex items-center gap-3"
-                  variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
-                >
+                <div key={i} className="glass-card p-4 flex items-center gap-3">
                   <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-sm font-bold shrink-0 ${
                     pct >= 70 ? "bg-success/10 text-success" : pct >= 40 ? "bg-warning/10 text-warning" : "bg-destructive/10 text-destructive"
                   }`}>
@@ -58,10 +48,10 @@ const History = () => {
                   <span className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full capitalize shrink-0">
                     {h.difficulty}
                   </span>
-                </motion.div>
+                </div>
               );
             })}
-          </motion.div>
+          </div>
         )}
       </div>
     </PageShell>

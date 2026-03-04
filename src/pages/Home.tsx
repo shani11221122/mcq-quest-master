@@ -67,7 +67,7 @@ const Home = () => {
             )}
           </div>
 
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+          <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.12 }}>
             <p className="text-primary-foreground/70 text-sm font-medium">Welcome back</p>
             <h1 className="text-2xl font-bold font-display text-primary-foreground mt-0.5">
               {user?.username || "Student"} 👋
@@ -76,9 +76,9 @@ const Home = () => {
 
           <motion.div
             className="flex gap-3 mt-6"
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
+            transition={{ duration: 0.12, delay: 0.04 }}
           >
             {stats.map((s) => {
               const Icon = s.icon;
@@ -98,25 +98,24 @@ const Home = () => {
       <div className="px-5 -mt-3">
         <motion.div
           className="grid grid-cols-2 gap-3"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={{ duration: 0.12, delay: 0.06 }}
         >
           {quickActions.map((action) => {
             const Icon = action.icon;
             return (
-              <motion.button
+              <button
                 key={action.label}
-                className={`glass-card p-4 text-left bg-gradient-to-br ${action.gradient} active:scale-[0.97]`}
+                className={`glass-card p-4 text-left bg-gradient-to-br ${action.gradient} active:scale-[0.97] transition-transform duration-100`}
                 onClick={() => navigate(action.route)}
-                whileTap={{ scale: 0.97 }}
               >
                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-3">
                   <Icon size={20} className="text-primary" />
                 </div>
                 <p className="font-semibold text-sm text-foreground">{action.label}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">{action.desc}</p>
-              </motion.button>
+              </button>
             );
           })}
         </motion.div>
@@ -135,7 +134,7 @@ const Home = () => {
           className="space-y-2"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
+          transition={{ duration: 0.12, delay: 0.08 }}
         >
           {history.length === 0 ? (
             <div className="glass-card p-6 text-center">

@@ -1,6 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { Home, BookOpen, BarChart3, Clock, Settings } from "lucide-react";
-import { motion } from "framer-motion";
 
 const tabs = [
   { icon: Home, label: "Home", path: "/home" },
@@ -10,7 +9,7 @@ const tabs = [
   { icon: Settings, label: "More", path: "/settings" },
 ];
 
-const BOTTOM_NAV_HEIGHT = "4rem"; // 64px
+const BOTTOM_NAV_HEIGHT = "4rem";
 
 const BottomNav = () => {
   const navigate = useNavigate();
@@ -33,22 +32,14 @@ const BottomNav = () => {
               className="relative flex flex-col items-center gap-0.5 py-2 px-3 min-w-[56px]"
             >
               {isActive && (
-                <motion.div
-                  layoutId="bottomnav-indicator"
-                  className="absolute -top-px left-1/2 -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full"
-                  transition={{ type: "spring", stiffness: 500, damping: 35 }}
-                />
+                <div className="absolute -top-px left-1/2 -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full" />
               )}
               <Icon
                 size={20}
-                className={`transition-colors duration-200 ${
-                  isActive ? "text-primary" : "text-muted-foreground"
-                }`}
+                className={isActive ? "text-primary" : "text-muted-foreground"}
               />
               <span
-                className={`text-[10px] font-medium transition-colors duration-200 ${
-                  isActive ? "text-primary" : "text-muted-foreground"
-                }`}
+                className={`text-[10px] font-medium ${isActive ? "text-primary" : "text-muted-foreground"}`}
               >
                 {tab.label}
               </span>

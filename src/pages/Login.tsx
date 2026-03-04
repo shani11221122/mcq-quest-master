@@ -32,44 +32,26 @@ const Login = () => {
           src={puzzleLogo}
           alt="MDCAT Prep"
           className="w-28 h-28 object-contain"
-          initial={{ scale: 0, rotate: -180 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 200, damping: 15 }}
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 400, damping: 20, duration: 0.2 }}
         />
       </div>
 
       <motion.div
         className="flex-1 -mt-6 bg-background rounded-t-[2rem] px-6 pt-10 pb-8 flex flex-col"
-        initial={{ y: 40, opacity: 0 }}
+        initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2 }}
+        transition={{ duration: 0.15, delay: 0.05 }}
       >
         <h1 className="text-2xl font-extrabold text-center mb-1">Welcome Back!</h1>
         <p className="text-muted-foreground text-center mb-8">Log in to continue</p>
 
         <form onSubmit={handleSubmit} className="space-y-4 flex-1 flex flex-col">
-          <input
-            type="text"
-            placeholder="Enter Username"
-            value={username}
-            onChange={e => setUsername(e.target.value)}
-            className="input-field w-full"
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            className="input-field w-full"
-            required
-          />
-          <button type="submit" className="btn-primary w-full mt-4">
-            Log in
-          </button>
-
+          <input type="text" placeholder="Enter Username" value={username} onChange={e => setUsername(e.target.value)} className="input-field w-full" required />
+          <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} className="input-field w-full" required />
+          <button type="submit" className="btn-primary w-full mt-4">Log in</button>
           <div className="flex-1" />
-
           <p className="text-center text-muted-foreground">
             Don't have an account?{" "}
             <Link to="/signup" className="text-primary font-bold">Sign up</Link>

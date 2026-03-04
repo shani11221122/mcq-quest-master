@@ -1,6 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, Check, X } from "lucide-react";
-import { motion } from "framer-motion";
 
 const optionLetters = ["A", "B", "C", "D"];
 
@@ -16,7 +15,6 @@ const ViewAnswers = () => {
 
   return (
     <div className="h-dvh flex flex-col bg-background">
-      {/* Fixed Header */}
       <div className="shrink-0 px-5 pt-12 pb-4 bg-background/90 backdrop-blur-xl border-b border-border/50">
         <div className="flex items-center gap-3">
           <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-xl bg-card border border-border flex items-center justify-center">
@@ -26,22 +24,12 @@ const ViewAnswers = () => {
         </div>
       </div>
 
-      {/* Scrollable Content */}
       <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
-        <motion.div
-          className="px-5 py-4 space-y-4 pb-8"
-          initial="hidden"
-          animate="show"
-          variants={{ hidden: {}, show: { transition: { staggerChildren: 0.03 } } }}
-        >
+        <div className="px-5 py-4 space-y-4 pb-8">
           {questions.map((q: any, i: number) => {
             const isCorrect = answers[i] === q.correctAnswer;
             return (
-              <motion.div
-                key={q.id}
-                className="glass-card p-4"
-                variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
-              >
+              <div key={q.id} className="glass-card p-4">
                 <div className="flex items-start gap-2 mb-3">
                   <span className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 text-xs font-bold ${
                     isCorrect ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"
@@ -71,10 +59,10 @@ const ViewAnswers = () => {
                     );
                   })}
                 </div>
-              </motion.div>
+              </div>
             );
           })}
-        </motion.div>
+        </div>
       </div>
     </div>
   );
