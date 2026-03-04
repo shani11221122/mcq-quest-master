@@ -27,23 +27,18 @@ const Result = () => {
 
   return (
     <div className="h-dvh bg-background flex flex-col">
-      {/* Fixed Header */}
       <div className="shrink-0 px-5 pt-12 pb-4 flex items-center gap-3">
-        <button
-          onClick={() => navigate("/home")}
-          className="w-9 h-9 rounded-xl bg-card border border-border flex items-center justify-center"
-        >
+        <button onClick={() => navigate("/home")} className="w-9 h-9 rounded-xl bg-card border border-border flex items-center justify-center">
           <ArrowLeft size={18} />
         </button>
         <h1 className="text-lg font-bold font-display">Quiz Result</h1>
       </div>
 
-      {/* Scrollable Content */}
       <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-5">
         <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
+          initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: "spring", stiffness: 200, damping: 20 }}
+          transition={{ type: "spring", stiffness: 400, damping: 25, duration: 0.2 }}
           className="mt-6 flex justify-center"
         >
           <CircularProgress value={result.correct} max={result.total} size={160} strokeWidth={10} labelSuffix="%" />
@@ -51,9 +46,9 @@ const Result = () => {
 
         <motion.div
           className="text-center mt-6"
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={{ duration: 0.12, delay: 0.08 }}
         >
           <h2 className="text-2xl font-bold font-display">{message.msg}</h2>
           <p className="text-sm text-muted-foreground mt-1">{message.sub}</p>
@@ -61,9 +56,9 @@ const Result = () => {
 
         <motion.div
           className="grid grid-cols-2 gap-3 w-full mt-8 pb-4"
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+          transition={{ duration: 0.12, delay: 0.1 }}
         >
           <div className="glass-card p-4 text-center">
             <p className="text-2xl font-bold font-display text-success">{result.correct}</p>
@@ -84,21 +79,15 @@ const Result = () => {
         </motion.div>
       </div>
 
-      {/* Fixed Bottom Actions */}
       <div className="shrink-0 px-5 py-4 space-y-3 border-t border-border/50 bg-background" style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom, 1rem))" }}>
-        <button
-          className="btn-primary w-full flex items-center justify-center gap-2"
-          onClick={() => navigate("/result/answers", { state: { answers, questions, result } })}
-        >
-          <Eye size={18} />
-          View Answers
+        <button className="btn-primary w-full flex items-center justify-center gap-2" onClick={() => navigate("/result/answers", { state: { answers, questions, result } })}>
+          <Eye size={18} /> View Answers
         </button>
         <button
-          className="w-full h-12 rounded-xl border-2 border-border text-foreground text-sm font-semibold flex items-center justify-center gap-2 hover:border-primary/30 transition-colors active:scale-[0.98]"
+          className="w-full h-12 rounded-xl border-2 border-border text-foreground text-sm font-semibold flex items-center justify-center gap-2 hover:border-primary/30 transition-colors duration-100 active:scale-[0.98]"
           onClick={() => navigate(`/quiz/${questions?.[0]?.subject || ""}`)}
         >
-          <RotateCcw size={18} />
-          Try Again
+          <RotateCcw size={18} /> Try Again
         </button>
       </div>
     </div>

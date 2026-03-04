@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import { motion } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
 import { subjects } from "@/lib/quiz-data";
 import CircularProgress from "@/components/CircularProgress";
@@ -41,25 +40,16 @@ const Dashboard = () => {
       </div>
 
       <div className="px-5 space-y-5 pb-4">
-        <motion.div
-          className="glass-card p-6 flex items-center gap-6"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+        <div className="glass-card p-6 flex items-center gap-6">
           <CircularProgress value={overallAcc} max={100} size={100} strokeWidth={8} />
           <div>
             <p className="text-sm font-bold font-display text-foreground">Overall Accuracy</p>
             <p className="text-xs text-muted-foreground mt-0.5">{history.length} quizzes taken</p>
             <p className="text-xs text-muted-foreground">{totalCorrect}/{totalQ} correct answers</p>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          className="glass-card p-5"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
+        <div className="glass-card p-5">
           <h3 className="text-sm font-bold font-display text-foreground mb-4">Subject Performance</h3>
           {history.length === 0 ? (
             <p className="text-xs text-muted-foreground text-center py-4">Take quizzes to see data</p>
@@ -68,22 +58,14 @@ const Dashboard = () => {
               <BarChart data={subjectData}>
                 <XAxis dataKey="name" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
                 <YAxis hide domain={[0, 100]} />
-                <Tooltip
-                  contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 12, fontSize: 12 }}
-                  formatter={(value: number) => [`${value}%`, "Accuracy"]}
-                />
+                <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 12, fontSize: 12 }} formatter={(value: number) => [`${value}%`, "Accuracy"]} />
                 <Bar dataKey="accuracy" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}
-        </motion.div>
+        </div>
 
-        <motion.div
-          className="glass-card p-5"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
+        <div className="glass-card p-5">
           <h3 className="text-sm font-bold font-display text-foreground mb-4">Improvement Trend</h3>
           {timeData.length < 2 ? (
             <p className="text-xs text-muted-foreground text-center py-4">Need more quizzes to show trend</p>
@@ -92,15 +74,12 @@ const Dashboard = () => {
               <LineChart data={timeData}>
                 <XAxis dataKey="quiz" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
                 <YAxis hide domain={[0, 100]} />
-                <Tooltip
-                  contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 12, fontSize: 12 }}
-                  formatter={(value: number) => [`${value}%`, "Score"]}
-                />
+                <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 12, fontSize: 12 }} formatter={(value: number) => [`${value}%`, "Score"]} />
                 <Line type="monotone" dataKey="score" stroke="hsl(var(--success))" strokeWidth={2} dot={{ r: 3, fill: "hsl(var(--success))" }} />
               </LineChart>
             </ResponsiveContainer>
           )}
-        </motion.div>
+        </div>
       </div>
     </PageShell>
   );

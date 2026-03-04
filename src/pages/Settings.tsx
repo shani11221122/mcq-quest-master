@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Moon, Sun, Monitor, LogOut, KeyRound, ChevronRight } from "lucide-react";
-import { motion } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
 import { useTheme } from "@/lib/theme-context";
 import PageShell from "@/components/PageShell";
@@ -42,7 +41,6 @@ const Settings = () => {
           <h1 className="text-xl font-bold font-display">Settings</h1>
         </div>
 
-        {/* Profile Card */}
         <div className="glass-card p-4 flex items-center gap-3 mb-6">
           <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
             <span className="text-lg font-bold text-primary">{user?.username?.charAt(0).toUpperCase() || "S"}</span>
@@ -53,8 +51,7 @@ const Settings = () => {
           </div>
         </div>
 
-        {/* Theme Section */}
-        <motion.div className="mb-6" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="mb-6">
           <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-1">Appearance</h2>
           <div className="glass-card p-1.5 flex gap-1">
             {themeOptions.map((opt) => {
@@ -64,7 +61,7 @@ const Settings = () => {
                 <button
                   key={opt.key}
                   onClick={() => setTheme(opt.key)}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold transition-colors duration-100 ${
                     isActive
                       ? "bg-primary text-primary-foreground shadow-sm"
                       : "text-muted-foreground hover:text-foreground"
@@ -76,26 +73,24 @@ const Settings = () => {
               );
             })}
           </div>
-        </motion.div>
+        </div>
 
-        {/* Menu Items */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-6">
+        <div className="mb-6">
           <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-1">Account</h2>
           <div className="glass-card overflow-hidden divide-y divide-border/50">
-            <button className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-muted/50 transition-colors">
+            <button className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-muted/50 transition-colors duration-100">
               <KeyRound size={18} className="text-muted-foreground" />
               <span className="flex-1 text-left text-sm font-medium text-foreground">Change Password</span>
               <ChevronRight size={16} className="text-muted-foreground" />
             </button>
-            <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-muted/50 transition-colors">
+            <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-muted/50 transition-colors duration-100">
               <LogOut size={18} className="text-destructive" />
               <span className="flex-1 text-left text-sm font-medium text-destructive">Log Out</span>
             </button>
           </div>
-        </motion.div>
+        </div>
 
-        {/* Rules */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+        <div>
           <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-1">Quiz Rules</h2>
           <div className="glass-card p-4 space-y-3">
             {rules.map((r, i) => (
@@ -107,7 +102,7 @@ const Settings = () => {
               </div>
             ))}
           </div>
-        </motion.div>
+        </div>
       </div>
     </PageShell>
   );
