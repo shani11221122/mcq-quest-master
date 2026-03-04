@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
-import BottomNav from "@/components/BottomNav";
+import PageShell from "@/components/PageShell";
 
 const History = () => {
   const navigate = useNavigate();
@@ -12,7 +12,7 @@ const History = () => {
     .reverse();
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <PageShell>
       <div className="px-5 pt-12 pb-4">
         <div className="flex items-center gap-3 mb-1">
           <button onClick={() => navigate("/home")} className="w-9 h-9 rounded-xl bg-card border border-border flex items-center justify-center">
@@ -22,7 +22,7 @@ const History = () => {
         </div>
       </div>
 
-      <div className="px-5">
+      <div className="px-5 pb-4">
         {history.length === 0 ? (
           <div className="glass-card p-8 text-center mt-8">
             <Clock size={32} className="text-muted-foreground mx-auto mb-3" />
@@ -46,7 +46,7 @@ const History = () => {
                   className="glass-card p-4 flex items-center gap-3"
                   variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
                 >
-                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-sm font-bold ${
+                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-sm font-bold shrink-0 ${
                     pct >= 70 ? "bg-success/10 text-success" : pct >= 40 ? "bg-warning/10 text-warning" : "bg-destructive/10 text-destructive"
                   }`}>
                     {pct}%
@@ -64,9 +64,7 @@ const History = () => {
           </motion.div>
         )}
       </div>
-
-      <BottomNav />
-    </div>
+    </PageShell>
   );
 };
 

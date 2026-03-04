@@ -4,7 +4,7 @@ import { ArrowLeft, Search, Timer, TimerOff } from "lucide-react";
 import { motion } from "framer-motion";
 import { subjects, getQuestionsBySubject } from "@/lib/quiz-data";
 import type { Difficulty } from "@/lib/quiz-data";
-import BottomNav from "@/components/BottomNav";
+import PageShell from "@/components/PageShell";
 
 const subjectIcons: Record<string, string> = {
   biology: "🧬",
@@ -42,7 +42,7 @@ const QuizSelect = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <PageShell>
       {/* Header */}
       <div className="px-5 pt-12 pb-4">
         <div className="flex items-center gap-3 mb-5">
@@ -65,10 +65,10 @@ const QuizSelect = () => {
         </div>
 
         {/* Timed Mode Toggle + Difficulty */}
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-2 mb-3 overflow-x-auto scrollbar-none">
           <button
             onClick={() => setTimedMode(!timedMode)}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 shrink-0 ${
               timedMode
                 ? "bg-warning text-warning-foreground shadow-sm"
                 : "bg-card border border-border text-muted-foreground hover:text-foreground"
@@ -77,12 +77,12 @@ const QuizSelect = () => {
             {timedMode ? <Timer size={14} /> : <TimerOff size={14} />}
             {timedMode ? "Timed" : "No Timer"}
           </button>
-          <div className="w-px h-6 bg-border" />
+          <div className="w-px h-6 bg-border shrink-0" />
           {difficulties.map((d) => (
             <button
               key={d.key}
               onClick={() => setDifficulty(d.key)}
-              className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
+              className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 shrink-0 ${
                 difficulty === d.key
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "bg-card border border-border text-muted-foreground hover:text-foreground"
@@ -143,9 +143,7 @@ const QuizSelect = () => {
           );
         })}
       </motion.div>
-
-      <BottomNav />
-    </div>
+    </PageShell>
   );
 };
 

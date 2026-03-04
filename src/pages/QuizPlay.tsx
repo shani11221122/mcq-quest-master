@@ -6,7 +6,7 @@ import { getQuestionsBySubject, subjects, type Difficulty } from "@/lib/quiz-dat
 import { useQuizTimer } from "@/hooks/use-quiz-timer";
 
 const optionLetters = ["A", "B", "C", "D"];
-const SECONDS_PER_QUESTION = 60; // 1 minute per question
+const SECONDS_PER_QUESTION = 60;
 
 const QuizPlay = () => {
   const { subjectId } = useParams();
@@ -64,7 +64,7 @@ const QuizPlay = () => {
 
   if (questions.length === 0) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6">
+      <div className="h-dvh bg-background flex flex-col items-center justify-center px-6">
         <p className="text-lg font-semibold mb-4">No questions available.</p>
         <button onClick={() => navigate("/quiz")} className="btn-primary px-8">
           Go Back
@@ -90,27 +90,26 @@ const QuizPlay = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Top bar */}
-      <div className="px-5 pt-12 pb-3 flex items-center gap-3">
+    <div className="h-dvh bg-background flex flex-col">
+      {/* Fixed Top Bar */}
+      <div className="shrink-0 px-5 pt-12 pb-3 flex items-center gap-3">
         <button
           onClick={() => navigate("/quiz")}
           className="w-9 h-9 rounded-xl bg-card border border-border flex items-center justify-center"
         >
           <X size={16} />
         </button>
-        <div className="flex-1">
-          <p className="text-sm font-semibold text-foreground">{subject?.name || "Quiz"}</p>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-foreground truncate">{subject?.name || "Quiz"}</p>
           <p className="text-[10px] text-muted-foreground capitalize">
             {difficulty ? `${difficulty} level` : "All levels"}
             {isTimed && " • Timed"}
           </p>
         </div>
 
-        {/* Timer or Counter */}
         {isTimed ? (
           <motion.div
-            className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 border transition-colors duration-300 ${
+            className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 border transition-colors duration-300 shrink-0 ${
               isCritical
                 ? "bg-destructive/10 border-destructive/30 text-destructive"
                 : isLow
@@ -124,18 +123,17 @@ const QuizPlay = () => {
             <span className="text-xs font-bold font-mono tabular-nums">{formatted}</span>
           </motion.div>
         ) : (
-          <div className="bg-card border border-border rounded-xl px-3 py-1.5">
+          <div className="bg-card border border-border rounded-xl px-3 py-1.5 shrink-0">
             <span className="text-xs font-bold text-primary">{current + 1}</span>
             <span className="text-xs text-muted-foreground">/{questions.length}</span>
           </div>
         )}
       </div>
 
-      {/* Progress bar */}
-      <div className="px-5 pb-4">
+      {/* Fixed Progress Bar */}
+      <div className="shrink-0 px-5 pb-4">
         {isTimed ? (
           <div className="space-y-1.5">
-            {/* Timer progress */}
             <div className="h-1.5 bg-muted rounded-full overflow-hidden">
               <motion.div
                 className={`h-full rounded-full transition-colors duration-300 ${
@@ -145,7 +143,6 @@ const QuizPlay = () => {
                 transition={{ duration: 0.5 }}
               />
             </div>
-            {/* Question progress */}
             <div className="flex items-center justify-between">
               <div className="h-1 bg-muted rounded-full overflow-hidden flex-1">
                 <motion.div
@@ -170,8 +167,8 @@ const QuizPlay = () => {
         )}
       </div>
 
-      {/* Question area */}
-      <div className="flex-1 px-5 flex flex-col">
+      {/* Scrollable Question + Options Area */}
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-5">
         <AnimatePresence mode="wait">
           <motion.div
             key={current}
@@ -179,13 +176,12 @@ const QuizPlay = () => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -30 }}
             transition={{ duration: 0.2 }}
-            className="flex-1 flex flex-col"
           >
             <div className="glass-card p-5 mb-5">
               <p className="text-base font-semibold leading-relaxed text-foreground">{q.question}</p>
             </div>
 
-            <div className="space-y-3 flex-1">
+            <div className="space-y-3 pb-4">
               {q.options.map((opt, i) => {
                 const isSelected = selected === i;
                 return (
@@ -217,16 +213,17 @@ const QuizPlay = () => {
             </div>
           </motion.div>
         </AnimatePresence>
+      </div>
 
-        <div className="py-5">
-          <button
-            onClick={handleNext}
-            disabled={selected === null}
-            className="btn-primary w-full disabled:opacity-40"
-          >
-            {current === questions.length - 1 ? "Finish Quiz" : "Next Question"}
-          </button>
-        </div>
+      {/* Fixed Bottom Action Bar */}
+      <div className="shrink-0 px-5 py-4 border-t border-border/50 bg-background" style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom, 1rem))" }}>
+        <button
+          onClick={handleNext}
+          disabled={selected === null}
+          className="btn-primary w-full disabled:opacity-40"
+        >
+          {current === questions.length - 1 ? "Finish Quiz" : "Next Question"}
+        </button>
       </div>
     </div>
   );

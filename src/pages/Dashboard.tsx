@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
 import { subjects } from "@/lib/quiz-data";
 import CircularProgress from "@/components/CircularProgress";
-import BottomNav from "@/components/BottomNav";
+import PageShell from "@/components/PageShell";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, LineChart, Line } from "recharts";
 
 const Dashboard = () => {
@@ -17,7 +17,6 @@ const Dashboard = () => {
   const totalQ = history.reduce((a: number, h: any) => a + h.total, 0);
   const overallAcc = totalQ > 0 ? Math.round((totalCorrect / totalQ) * 100) : 0;
 
-  // Subject performance
   const subjectData = subjects.map((s) => {
     const sh = history.filter((h: any) => h.subject?.toLowerCase() === s.name.toLowerCase() || h.subject === s.id);
     const c = sh.reduce((a: number, h: any) => a + h.correct, 0);
@@ -25,14 +24,13 @@ const Dashboard = () => {
     return { name: s.name.slice(0, 7), accuracy: t > 0 ? Math.round((c / t) * 100) : 0, attempts: sh.length };
   });
 
-  // Improvement over time (last 7 quizzes)
   const timeData = history.slice(-7).map((h: any, i: number) => ({
     quiz: `Q${i + 1}`,
     score: h.total > 0 ? Math.round((h.correct / h.total) * 100) : 0,
   }));
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <PageShell>
       <div className="px-5 pt-12 pb-4">
         <div className="flex items-center gap-3 mb-1">
           <button onClick={() => navigate("/home")} className="w-9 h-9 rounded-xl bg-card border border-border flex items-center justify-center">
@@ -42,8 +40,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="px-5 space-y-5">
-        {/* Overall score */}
+      <div className="px-5 space-y-5 pb-4">
         <motion.div
           className="glass-card p-6 flex items-center gap-6"
           initial={{ opacity: 0, y: 10 }}
@@ -57,7 +54,6 @@ const Dashboard = () => {
           </div>
         </motion.div>
 
-        {/* Subject Performance Bar Chart */}
         <motion.div
           className="glass-card p-5"
           initial={{ opacity: 0, y: 10 }}
@@ -82,7 +78,6 @@ const Dashboard = () => {
           )}
         </motion.div>
 
-        {/* Improvement Over Time */}
         <motion.div
           className="glass-card p-5"
           initial={{ opacity: 0, y: 10 }}
@@ -107,9 +102,7 @@ const Dashboard = () => {
           )}
         </motion.div>
       </div>
-
-      <BottomNav />
-    </div>
+    </PageShell>
   );
 };
 

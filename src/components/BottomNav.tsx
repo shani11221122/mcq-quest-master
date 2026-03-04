@@ -10,15 +10,20 @@ const tabs = [
   { icon: Settings, label: "More", path: "/settings" },
 ];
 
+const BOTTOM_NAV_HEIGHT = "4rem"; // 64px
+
 const BottomNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-xl border-t border-border/50 px-2 pb-[env(safe-area-inset-bottom)]">
-      <div className="flex items-center justify-around max-w-lg mx-auto">
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-xl border-t border-border/50"
+      style={{ height: `calc(${BOTTOM_NAV_HEIGHT} + env(safe-area-inset-bottom, 0px))`, paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+    >
+      <div className="flex items-center justify-around max-w-lg mx-auto h-16">
         {tabs.map((tab) => {
-          const isActive = location.pathname === tab.path || 
+          const isActive = location.pathname === tab.path ||
             (tab.path === "/quiz" && location.pathname.startsWith("/quiz"));
           const Icon = tab.icon;
           return (
@@ -55,4 +60,5 @@ const BottomNav = () => {
   );
 };
 
+export { BOTTOM_NAV_HEIGHT };
 export default BottomNav;

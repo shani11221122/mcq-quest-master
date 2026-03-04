@@ -26,9 +26,9 @@ const Result = () => {
   const message = motivationalMessages.find((m) => percentage >= m.min)!;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <div className="px-5 pt-12 pb-4 flex items-center gap-3">
+    <div className="h-dvh bg-background flex flex-col">
+      {/* Fixed Header */}
+      <div className="shrink-0 px-5 pt-12 pb-4 flex items-center gap-3">
         <button
           onClick={() => navigate("/home")}
           className="w-9 h-9 rounded-xl bg-card border border-border flex items-center justify-center"
@@ -38,24 +38,17 @@ const Result = () => {
         <h1 className="text-lg font-bold font-display">Quiz Result</h1>
       </div>
 
-      <div className="flex-1 px-5 flex flex-col items-center">
-        {/* Score Circle */}
+      {/* Scrollable Content */}
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-5">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 200, damping: 20 }}
-          className="mt-6"
+          className="mt-6 flex justify-center"
         >
-          <CircularProgress
-            value={result.correct}
-            max={result.total}
-            size={160}
-            strokeWidth={10}
-            labelSuffix="%"
-          />
+          <CircularProgress value={result.correct} max={result.total} size={160} strokeWidth={10} labelSuffix="%" />
         </motion.div>
 
-        {/* Message */}
         <motion.div
           className="text-center mt-6"
           initial={{ opacity: 0, y: 10 }}
@@ -66,9 +59,8 @@ const Result = () => {
           <p className="text-sm text-muted-foreground mt-1">{message.sub}</p>
         </motion.div>
 
-        {/* Stats Grid */}
         <motion.div
-          className="grid grid-cols-2 gap-3 w-full mt-8"
+          className="grid grid-cols-2 gap-3 w-full mt-8 pb-4"
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
@@ -92,8 +84,8 @@ const Result = () => {
         </motion.div>
       </div>
 
-      {/* Actions */}
-      <div className="px-5 pb-8 space-y-3">
+      {/* Fixed Bottom Actions */}
+      <div className="shrink-0 px-5 py-4 space-y-3 border-t border-border/50 bg-background" style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom, 1rem))" }}>
         <button
           className="btn-primary w-full flex items-center justify-center gap-2"
           onClick={() => navigate("/result/answers", { state: { answers, questions, result } })}

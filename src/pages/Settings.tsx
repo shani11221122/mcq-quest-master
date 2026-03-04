@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Moon, Sun, Monitor, ScrollText, LogOut, KeyRound, ChevronRight } from "lucide-react";
+import { ArrowLeft, Moon, Sun, Monitor, LogOut, KeyRound, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
 import { useTheme } from "@/lib/theme-context";
-import BottomNav from "@/components/BottomNav";
+import PageShell from "@/components/PageShell";
 
 const themeOptions = [
   { key: "light" as const, label: "Light", icon: Sun },
@@ -33,7 +33,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <PageShell>
       <div className="px-5 pt-12 pb-4">
         <div className="flex items-center gap-3 mb-6">
           <button onClick={() => navigate("/home")} className="w-9 h-9 rounded-xl bg-card border border-border flex items-center justify-center">
@@ -44,7 +44,7 @@ const Settings = () => {
 
         {/* Profile Card */}
         <div className="glass-card p-4 flex items-center gap-3 mb-6">
-          <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center">
+          <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
             <span className="text-lg font-bold text-primary">{user?.username?.charAt(0).toUpperCase() || "S"}</span>
           </div>
           <div className="flex-1 min-w-0">
@@ -54,11 +54,7 @@ const Settings = () => {
         </div>
 
         {/* Theme Section */}
-        <motion.div
-          className="mb-6"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+        <motion.div className="mb-6" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-1">Appearance</h2>
           <div className="glass-card p-1.5 flex gap-1">
             {themeOptions.map((opt) => {
@@ -83,12 +79,7 @@ const Settings = () => {
         </motion.div>
 
         {/* Menu Items */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="mb-6"
-        >
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-6">
           <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-1">Account</h2>
           <div className="glass-card overflow-hidden divide-y divide-border/50">
             <button className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-muted/50 transition-colors">
@@ -96,10 +87,7 @@ const Settings = () => {
               <span className="flex-1 text-left text-sm font-medium text-foreground">Change Password</span>
               <ChevronRight size={16} className="text-muted-foreground" />
             </button>
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-muted/50 transition-colors"
-            >
+            <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-muted/50 transition-colors">
               <LogOut size={18} className="text-destructive" />
               <span className="flex-1 text-left text-sm font-medium text-destructive">Log Out</span>
             </button>
@@ -107,11 +95,7 @@ const Settings = () => {
         </motion.div>
 
         {/* Rules */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
           <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-1">Quiz Rules</h2>
           <div className="glass-card p-4 space-y-3">
             {rules.map((r, i) => (
@@ -125,9 +109,7 @@ const Settings = () => {
           </div>
         </motion.div>
       </div>
-
-      <BottomNav />
-    </div>
+    </PageShell>
   );
 };
 
