@@ -7,7 +7,7 @@ const tabs = [
   { icon: BookOpen, label: "Quiz", path: "/quiz" },
   { icon: BarChart3, label: "Stats", path: "/dashboard" },
   { icon: Clock, label: "History", path: "/history" },
-  { icon: Settings, label: "More", path: "/rules" },
+  { icon: Settings, label: "More", path: "/settings" },
 ];
 
 const BottomNav = () => {
