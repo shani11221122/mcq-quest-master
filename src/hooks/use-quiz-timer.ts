@@ -2,31 +2,41 @@ import { useState, useEffect, useCallback, useRef } from "react";
 
 interface UseQuizTimerProps {
   totalSeconds: number;
+  initialSeconds?: number;
   onTimeUp: () => void;
+  onTick?: (secondsLeft: number) => void;
   enabled: boolean;
 }
 
-export function useQuizTimer({ totalSeconds, onTimeUp, enabled }: UseQuizTimerProps) {
-  const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
+export function useQuizTimer({ totalSeconds, initialSeconds, onTimeUp, onTick, enabled }: UseQuizTimerProps) {
+  const [secondsLeft, setSecondsLeft] = useState(initialSeconds ?? totalSeconds);
   const onTimeUpRef = useRef(onTimeUp);
+  const onTickRef = useRef(onTick);
   onTimeUpRef.current = onTimeUp;
+  onTickRef.current = onTick;
+  const initializedRef = useRef(false);
 
   useEffect(() => {
     if (!enabled) return;
-    setSecondsLeft(totalSeconds);
-  }, [totalSeconds, enabled]);
+    if (!initializedRef.current) {
+      setSecondsLeft(initialSeconds ?? totalSeconds);
+      initializedRef.current = true;
+    }
+  }, [totalSeconds, initialSeconds, enabled]);
 
   useEffect(() => {
     if (!enabled || secondsLeft <= 0) return;
 
     const interval = setInterval(() => {
       setSecondsLeft((prev) => {
-        if (prev <= 1) {
+        const next = prev - 1;
+        if (next <= 0) {
           clearInterval(interval);
           setTimeout(() => onTimeUpRef.current(), 0);
           return 0;
         }
-        return prev - 1;
+        onTickRef.current?.(next);
+        return next;
       });
     }, 1000);
 

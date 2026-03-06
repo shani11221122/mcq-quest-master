@@ -1,11 +1,12 @@
 const DB_NAME = "mdcat_quiz_db";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const QUESTIONS_STORE = "questions";
+const PROGRESS_STORE = "mock_progress";
 
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
-    request.onupgradeneeded = () => {
+    request.onupgradeneeded = (event) => {
       const db = request.result;
       if (!db.objectStoreNames.contains(QUESTIONS_STORE)) {
         const store = db.createObjectStore(QUESTIONS_STORE, { keyPath: "id" });
@@ -13,11 +14,16 @@ function openDB(): Promise<IDBDatabase> {
         store.createIndex("difficulty", "difficulty", { unique: false });
         store.createIndex("subject_difficulty", ["subject", "difficulty"], { unique: false });
       }
+      if (!db.objectStoreNames.contains(PROGRESS_STORE)) {
+        db.createObjectStore(PROGRESS_STORE, { keyPath: "username" });
+      }
     };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
 }
+
+// ─── Question types & CRUD ───
 
 export interface StoredQuestion {
   id: string;
@@ -128,4 +134,45 @@ export async function migrateFromLocalStorage(): Promise<number> {
   } catch {
     return 0;
   }
+}
+
+// ─── Mock Test Progress ───
+
+export interface MockProgress {
+  username: string;
+  questions: any[]; // Question[]
+  answers: (number | null)[];
+  currentIndex: number;
+  secondsLeft: number;
+  savedAt: number;
+}
+
+export async function saveMockProgress(progress: MockProgress): Promise<void> {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(PROGRESS_STORE, "readwrite");
+    tx.objectStore(PROGRESS_STORE).put(progress);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+export async function getMockProgress(username: string): Promise<MockProgress | null> {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(PROGRESS_STORE, "readonly");
+    const req = tx.objectStore(PROGRESS_STORE).get(username);
+    req.onsuccess = () => resolve(req.result || null);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+export async function deleteMockProgress(username: string): Promise<void> {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(PROGRESS_STORE, "readwrite");
+    tx.objectStore(PROGRESS_STORE).delete(username);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
 }
