@@ -41,6 +41,8 @@ const Admin = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormData>({ ...emptyForm });
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [premiumCode, setPremiumCodeState] = useState(getPremiumCode());
+  const [showPremiumEdit, setShowPremiumEdit] = useState(false);
 
   useEffect(() => {
     if (!user?.isAdmin) {
