@@ -46,12 +46,15 @@ export function getQuestionsBySubject(subject: string, difficulty?: Difficulty):
   return questions;
 }
 
-/** Async version that includes IndexedDB questions */
+/** Async version that includes IndexedDB questions (deduplicated by ID) */
 export async function getQuestionsBySubjectAsync(subject: string, difficulty?: Difficulty): Promise<Question[]> {
   const { getAllQuestions } = await import("@/lib/indexeddb");
   const dbQuestions = await getAllQuestions();
-  const allQuestions: Question[] = [...sampleQuestions, ...dbQuestions];
-  let questions = allQuestions.filter(q => q.subject === subject);
+  // Deduplicate: DB questions override sample questions with same ID
+  const map = new Map<string, Question>();
+  sampleQuestions.forEach(q => map.set(q.id, q));
+  dbQuestions.forEach(q => map.set(q.id, q));
+  let questions = Array.from(map.values()).filter(q => q.subject === subject);
   if (difficulty) {
     questions = questions.filter(q => q.difficulty === difficulty);
   }
