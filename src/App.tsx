@@ -17,6 +17,7 @@ import History from "./pages/History";
 import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import Rules from "./pages/Rules";
+import MockTest from "./pages/MockTest";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
@@ -43,6 +44,7 @@ const App = () => (
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/rules" element={<Rules />} />
+              <Route path="/mock-test" element={<MockTest />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
