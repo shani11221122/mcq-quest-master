@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { X, Timer, TimerOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -7,6 +7,29 @@ import { useQuizTimer } from "@/hooks/use-quiz-timer";
 
 const optionLetters = ["A", "B", "C", "D"];
 const SECONDS_PER_QUESTION = 60;
+
+/** Fisher-Yates shuffle */
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/** Get IDs of previously seen questions for this subject */
+function getSeenIds(subject: string): Set<string> {
+  try {
+    const raw = localStorage.getItem(`mdcat_seen_${subject}`);
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch { return new Set(); }
+}
+
+/** Save seen question IDs */
+function saveSeenIds(subject: string, ids: Set<string>) {
+  localStorage.setItem(`mdcat_seen_${subject}`, JSON.stringify([...ids]));
+}
 
 const QuizPlay = () => {
   const { subjectId } = useParams();
@@ -17,11 +40,24 @@ const QuizPlay = () => {
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
+  const seenRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
-    getQuestionsBySubjectAsync(subjectId || "", difficulty || undefined).then(q => {
-      setQuestions(q);
-      setAnswers(new Array(q.length).fill(null));
+    const key = subjectId || "";
+    getQuestionsBySubjectAsync(key, difficulty || undefined).then(all => {
+      const seen = getSeenIds(key);
+      // Prioritize unseen questions; if all seen, reset and use all
+      let unseen = all.filter(q => !seen.has(q.id));
+      if (unseen.length === 0) {
+        // All questions exhausted — reset seen pool
+        seen.clear();
+        saveSeenIds(key, seen);
+        unseen = all;
+      }
+      const shuffled = shuffle(unseen);
+      seenRef.current = seen;
+      setQuestions(shuffled);
+      setAnswers(new Array(shuffled.length).fill(null));
       setLoading(false);
     });
   }, [subjectId, difficulty]);
@@ -41,6 +77,13 @@ const QuizPlay = () => {
     finalAnswers.forEach((a, i) => {
       if (a === questions[i]?.correctAnswer) correct++;
     });
+
+    // Mark all attempted questions as seen
+    const key = subjectId || "";
+    const seen = seenRef.current;
+    questions.forEach(q => seen.add(q.id));
+    saveSeenIds(key, seen);
+
     const result = {
       subject: subject?.name || subjectId,
       correct,
