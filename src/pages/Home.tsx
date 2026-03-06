@@ -62,8 +62,9 @@ const Home = () => {
             {user?.isAdmin && (
               <button
                 onClick={() => navigate("/admin")}
-                className="bg-primary-foreground/15 text-primary-foreground px-3 py-1.5 rounded-lg text-xs font-semibold backdrop-blur-sm"
+                className="bg-primary-foreground/15 text-primary-foreground px-3 py-1.5 rounded-lg text-xs font-semibold backdrop-blur-sm flex items-center gap-1.5"
               >
+                <Shield size={14} />
                 Admin
               </button>
             )}
