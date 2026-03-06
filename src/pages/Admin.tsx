@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2, Pencil, Search, X, Check, ChevronDown, Database, Download, Upload } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Pencil, Search, X, Check, ChevronDown, Database, Download, Upload, KeyRound } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import { getPremiumCode, setPremiumCode } from "@/lib/auth-context";
 import { subjects, type Difficulty, sampleQuestions } from "@/lib/quiz-data";
 import { getAllQuestions, addQuestion, updateQuestion, deleteQuestion, importQuestions, migrateFromLocalStorage, type StoredQuestion } from "@/lib/indexeddb";
 import { toast } from "sonner";
@@ -40,6 +41,8 @@ const Admin = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormData>({ ...emptyForm });
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [premiumCode, setPremiumCodeState] = useState(getPremiumCode());
+  const [showPremiumEdit, setShowPremiumEdit] = useState(false);
 
   useEffect(() => {
     if (!user?.isAdmin) {
@@ -213,6 +216,28 @@ const Admin = () => {
               className="flex items-center gap-1.5 bg-secondary text-secondary-foreground px-3 py-2 rounded-xl text-xs font-bold active:scale-95 transition-transform duration-100">
               <Upload size={14} /> Import
             </button>
+          </div>
+
+          {/* Premium Code Management */}
+          <div className="border border-border rounded-2xl p-4 bg-card">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <KeyRound size={16} className="text-primary" />
+                <h3 className="text-sm font-bold text-foreground">Premium Unlock Code</h3>
+              </div>
+              <button onClick={() => setShowPremiumEdit(!showPremiumEdit)}
+                className="text-xs text-primary font-semibold">{showPremiumEdit ? "Cancel" : "Edit"}</button>
+            </div>
+            {showPremiumEdit ? (
+              <div className="flex gap-2 mt-3">
+                <input value={premiumCode} onChange={e => setPremiumCodeState(e.target.value)}
+                  className="flex-1 h-9 rounded-xl border border-input bg-background px-3 text-sm font-mono uppercase text-foreground" />
+                <button onClick={() => { setPremiumCode(premiumCode); setShowPremiumEdit(false); toast.success("Code updated"); }}
+                  className="h-9 px-4 bg-primary text-primary-foreground rounded-xl text-xs font-bold">Save</button>
+              </div>
+            ) : (
+              <p className="mt-2 text-sm font-mono tracking-wider text-muted-foreground">{premiumCode}</p>
+            )}
           </div>
 
           {/* Add/Edit Form */}
