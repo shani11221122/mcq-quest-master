@@ -1,8 +1,8 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { X, Timer, TimerOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { getQuestionsBySubject, subjects, type Difficulty } from "@/lib/quiz-data";
+import { getQuestionsBySubjectAsync, subjects, type Difficulty, type Question } from "@/lib/quiz-data";
 import { useQuizTimer } from "@/hooks/use-quiz-timer";
 
 const optionLetters = ["A", "B", "C", "D"];
@@ -15,8 +15,15 @@ const QuizPlay = () => {
   const difficulty = searchParams.get("difficulty") as Difficulty | null;
   const isTimed = searchParams.get("timed") === "true";
 
-  const questions = useMemo(() => {
-    return getQuestionsBySubject(subjectId || "", difficulty || undefined);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getQuestionsBySubjectAsync(subjectId || "", difficulty || undefined).then(q => {
+      setQuestions(q);
+      setAnswers(new Array(q.length).fill(null));
+      setLoading(false);
+    });
   }, [subjectId, difficulty]);
 
   const subject = subjects.find((s) => s.id === subjectId);
