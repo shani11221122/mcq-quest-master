@@ -77,6 +77,13 @@ const QuizPlay = () => {
     finalAnswers.forEach((a, i) => {
       if (a === questions[i]?.correctAnswer) correct++;
     });
+
+    // Mark all attempted questions as seen
+    const key = subjectId || "";
+    const seen = seenRef.current;
+    questions.forEach(q => seen.add(q.id));
+    saveSeenIds(key, seen);
+
     const result = {
       subject: subject?.name || subjectId,
       correct,
