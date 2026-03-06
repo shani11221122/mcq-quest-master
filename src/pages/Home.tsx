@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
-import { BookOpen, ClipboardCheck, Trophy, Target, Flame, ChevronRight } from "lucide-react";
+import { BookOpen, ClipboardCheck, Trophy, Target, Flame, ChevronRight, Crown } from "lucide-react";
 import PageShell from "@/components/PageShell";
 import logo from "@/assets/logo.png";
 
@@ -39,9 +39,11 @@ const Home = () => {
     { icon: Flame, label: "Streak", value: streak, color: "text-warning" },
   ];
 
+  const isPremium = user?.isPremium || user?.isAdmin;
+
   const quickActions = [
-    { icon: BookOpen, label: "Start Quiz", desc: "Practice by subject", route: "/quiz", gradient: "from-primary/10 to-primary/5" },
-    { icon: ClipboardCheck, label: "Mock Test", desc: "Full exam simulation", route: "/quiz", gradient: "from-success/10 to-success/5" },
+    { icon: BookOpen, label: "Start Quiz", desc: "Practice by subject", route: "/quiz", gradient: "from-primary/10 to-primary/5", premium: false },
+    { icon: ClipboardCheck, label: "Mock Test", desc: isPremium ? "50 MCQs · Timed" : "Premium · 50 MCQs", route: "/mock-test", gradient: "from-success/10 to-success/5", premium: !isPremium },
   ];
 
   return (
@@ -107,9 +109,14 @@ const Home = () => {
             return (
               <button
                 key={action.label}
-                className={`glass-card p-4 text-left bg-gradient-to-br ${action.gradient} active:scale-[0.97] transition-transform duration-100`}
+                className={`glass-card p-4 text-left bg-gradient-to-br ${action.gradient} active:scale-[0.97] transition-transform duration-100 relative overflow-hidden`}
                 onClick={() => navigate(action.route)}
               >
+                {action.premium && (
+                  <div className="absolute top-2 right-2">
+                    <Crown size={14} className="text-primary" />
+                  </div>
+                )}
                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-3">
                   <Icon size={20} className="text-primary" />
                 </div>
