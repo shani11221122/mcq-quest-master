@@ -7,6 +7,7 @@ import { useQuizTimer } from "@/hooks/use-quiz-timer";
 
 const optionLetters = ["A", "B", "C", "D"];
 const SECONDS_PER_QUESTION = 60;
+const QUESTIONS_PER_CATEGORY = 10;
 
 /** Fisher-Yates shuffle */
 function shuffle<T>(arr: T[]): T[] {
@@ -18,17 +19,20 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-/** Get IDs of previously seen questions for this subject */
-function getSeenIds(subject: string): Set<string> {
+/** Seen-pool key includes subject + difficulty for granular tracking */
+function seenKey(subject: string, difficulty?: string): string {
+  return `mdcat_seen_${subject}${difficulty ? `_${difficulty}` : ""}`;
+}
+
+function getSeenIds(subject: string, difficulty?: string): Set<string> {
   try {
-    const raw = localStorage.getItem(`mdcat_seen_${subject}`);
+    const raw = localStorage.getItem(seenKey(subject, difficulty));
     return raw ? new Set(JSON.parse(raw)) : new Set();
   } catch { return new Set(); }
 }
 
-/** Save seen question IDs */
-function saveSeenIds(subject: string, ids: Set<string>) {
-  localStorage.setItem(`mdcat_seen_${subject}`, JSON.stringify([...ids]));
+function saveSeenIds(subject: string, ids: Set<string>, difficulty?: string) {
+  localStorage.setItem(seenKey(subject, difficulty), JSON.stringify([...ids]));
 }
 
 const QuizPlay = () => {
@@ -45,19 +49,19 @@ const QuizPlay = () => {
   useEffect(() => {
     const key = subjectId || "";
     getQuestionsBySubjectAsync(key, difficulty || undefined).then(all => {
-      const seen = getSeenIds(key);
-      // Prioritize unseen questions; if all seen, reset and use all
+      const seen = getSeenIds(key, difficulty || undefined);
       let unseen = all.filter(q => !seen.has(q.id));
       if (unseen.length === 0) {
-        // All questions exhausted — reset seen pool
         seen.clear();
-        saveSeenIds(key, seen);
+        saveSeenIds(key, seen, difficulty || undefined);
         unseen = all;
       }
       const shuffled = shuffle(unseen);
+      // Limit to exactly QUESTIONS_PER_CATEGORY when a difficulty is selected
+      const limited = difficulty ? shuffled.slice(0, QUESTIONS_PER_CATEGORY) : shuffled;
       seenRef.current = seen;
-      setQuestions(shuffled);
-      setAnswers(new Array(shuffled.length).fill(null));
+      setQuestions(limited);
+      setAnswers(new Array(limited.length).fill(null));
       setLoading(false);
     });
   }, [subjectId, difficulty]);
