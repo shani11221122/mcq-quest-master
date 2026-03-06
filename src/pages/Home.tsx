@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
-import { BookOpen, ClipboardCheck, Trophy, Target, Flame, ChevronRight, Crown } from "lucide-react";
+import { BookOpen, ClipboardCheck, Trophy, Target, Flame, ChevronRight, Crown, Shield } from "lucide-react";
 import PageShell from "@/components/PageShell";
 import logo from "@/assets/logo.png";
 
