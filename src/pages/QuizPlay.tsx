@@ -29,7 +29,7 @@ const QuizPlay = () => {
   const subject = subjects.find((s) => s.id === subjectId);
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
-  const [answers, setAnswers] = useState<(number | null)[]>(new Array(questions.length).fill(null));
+  const [answers, setAnswers] = useState<(number | null)[]>([]);
   const [finished, setFinished] = useState(false);
 
   const totalTime = questions.length * SECONDS_PER_QUESTION;
