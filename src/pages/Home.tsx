@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
-import { BookOpen, ClipboardCheck, Trophy, Target, Flame, ChevronRight, Crown } from "lucide-react";
+import { BookOpen, ClipboardCheck, Trophy, Target, Flame, ChevronRight, Crown, Shield } from "lucide-react";
 import PageShell from "@/components/PageShell";
 import logo from "@/assets/logo.png";
 
@@ -62,8 +62,9 @@ const Home = () => {
             {user?.isAdmin && (
               <button
                 onClick={() => navigate("/admin")}
-                className="bg-primary-foreground/15 text-primary-foreground px-3 py-1.5 rounded-lg text-xs font-semibold backdrop-blur-sm"
+                className="bg-primary-foreground/15 text-primary-foreground px-3 py-1.5 rounded-lg text-xs font-semibold backdrop-blur-sm flex items-center gap-1.5"
               >
+                <Shield size={14} />
                 Admin
               </button>
             )}

@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/lib/auth-context";
 import { ThemeProvider } from "@/lib/theme-context";
+import AdminRoute from "@/components/AdminRoute";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -19,6 +20,7 @@ import Settings from "./pages/Settings";
 import Rules from "./pages/Rules";
 import MockTest from "./pages/MockTest";
 import Admin from "./pages/Admin";
+import AdminLogin from "./pages/AdminLogin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,7 +47,8 @@ const App = () => (
               <Route path="/settings" element={<Settings />} />
               <Route path="/rules" element={<Rules />} />
               <Route path="/mock-test" element={<MockTest />} />
-              <Route path="/admin" element={<Admin />} />
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
