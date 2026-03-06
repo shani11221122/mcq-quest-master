@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2, Pencil, Search, X, Check, ChevronDown, Database, Download, Upload } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Pencil, Search, X, Check, ChevronDown, Database, Download, Upload, KeyRound } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import { getPremiumCode, setPremiumCode } from "@/lib/auth-context";
 import { subjects, type Difficulty, sampleQuestions } from "@/lib/quiz-data";
 import { getAllQuestions, addQuestion, updateQuestion, deleteQuestion, importQuestions, migrateFromLocalStorage, type StoredQuestion } from "@/lib/indexeddb";
 import { toast } from "sonner";
