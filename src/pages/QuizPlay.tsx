@@ -1,8 +1,8 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { X, Timer, TimerOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { getQuestionsBySubject, subjects, type Difficulty } from "@/lib/quiz-data";
+import { getQuestionsBySubjectAsync, subjects, type Difficulty, type Question } from "@/lib/quiz-data";
 import { useQuizTimer } from "@/hooks/use-quiz-timer";
 
 const optionLetters = ["A", "B", "C", "D"];
@@ -15,14 +15,21 @@ const QuizPlay = () => {
   const difficulty = searchParams.get("difficulty") as Difficulty | null;
   const isTimed = searchParams.get("timed") === "true";
 
-  const questions = useMemo(() => {
-    return getQuestionsBySubject(subjectId || "", difficulty || undefined);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getQuestionsBySubjectAsync(subjectId || "", difficulty || undefined).then(q => {
+      setQuestions(q);
+      setAnswers(new Array(q.length).fill(null));
+      setLoading(false);
+    });
   }, [subjectId, difficulty]);
 
   const subject = subjects.find((s) => s.id === subjectId);
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
-  const [answers, setAnswers] = useState<(number | null)[]>(new Array(questions.length).fill(null));
+  const [answers, setAnswers] = useState<(number | null)[]>([]);
   const [finished, setFinished] = useState(false);
 
   const totalTime = questions.length * SECONDS_PER_QUESTION;
@@ -61,6 +68,14 @@ const QuizPlay = () => {
     onTimeUp: handleTimeUp,
     enabled: isTimed && !finished,
   });
+
+  if (loading) {
+    return (
+      <div className="h-dvh bg-background flex items-center justify-center">
+        <p className="text-sm text-muted-foreground">Loading questions...</p>
+      </div>
+    );
+  }
 
   if (questions.length === 0) {
     return (
