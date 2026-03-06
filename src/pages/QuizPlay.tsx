@@ -69,6 +69,14 @@ const QuizPlay = () => {
     enabled: isTimed && !finished,
   });
 
+  if (loading) {
+    return (
+      <div className="h-dvh bg-background flex items-center justify-center">
+        <p className="text-sm text-muted-foreground">Loading questions...</p>
+      </div>
+    );
+  }
+
   if (questions.length === 0) {
     return (
       <div className="h-dvh bg-background flex flex-col items-center justify-center px-6">
