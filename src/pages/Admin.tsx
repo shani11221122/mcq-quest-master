@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Plus, Trash2, Pencil, Search, X, Check, ChevronDown,
   Database, Download, Upload, KeyRound, BookOpen, BarChart3,
-  Shield, LogOut, ChevronRight, Layers, Clock, TrendingUp
+  Shield, LogOut, ChevronRight, Layers, Clock, TrendingUp, Eye, EyeOff, UserCog
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
