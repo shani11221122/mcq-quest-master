@@ -14,6 +14,7 @@ import {
   importQuestions, migrateFromLocalStorage, type StoredQuestion
 } from "@/lib/indexeddb";
 import { toast } from "sonner";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, PieChart, Pie, Cell } from "recharts";
 
 // ─── Types & Constants ───
 
