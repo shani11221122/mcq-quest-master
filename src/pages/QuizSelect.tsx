@@ -50,9 +50,9 @@ const QuizSelect = () => {
           <h1 className="text-xl font-bold font-display">Choose Subject</h1>
         </div>
 
-        <div className="relative mb-4">
-          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <input type="text" placeholder="Search subjects..." value={search} onChange={(e) => setSearch(e.target.value)} className="input-field w-full pl-10" />
+        <div className="flex items-center gap-3 h-12 bg-muted border border-border rounded-xl px-4 mb-4 focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent transition-all duration-200">
+          <Search size={16} className="text-muted-foreground shrink-0" />
+          <input type="text" placeholder="Search subjects..." value={search} onChange={(e) => setSearch(e.target.value)} className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none h-full" />
         </div>
 
         <div className="flex items-center gap-2 mb-3 overflow-x-auto scrollbar-none">
