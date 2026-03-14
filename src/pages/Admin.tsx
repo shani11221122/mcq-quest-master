@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Plus, Trash2, Pencil, Search, X, Check, ChevronDown,
@@ -14,6 +14,7 @@ import {
   importQuestions, migrateFromLocalStorage, type StoredQuestion
 } from "@/lib/indexeddb";
 import { toast } from "sonner";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, PieChart, Pie, Cell } from "recharts";
 
 // ─── Types & Constants ───
 
@@ -124,6 +125,45 @@ const Admin = () => {
     quizAttempts: history.length,
   };
 
+  // ─── Analytics Data ───
+
+  const CHART_COLORS = ["hsl(var(--primary))", "hsl(var(--destructive))", "hsl(var(--warning, 45 93% 47%))", "hsl(142 76% 36%)", "hsl(262 83% 58%)"];
+
+  const subjectAccuracyData = useMemo(() =>
+    subjects.map(s => {
+      const sh = history.filter((h: any) => h.subject?.toLowerCase() === s.name?.toLowerCase() || h.subject === s.id);
+      const total = sh.reduce((a: number, h: any) => a + h.total, 0);
+      const correct = sh.reduce((a: number, h: any) => a + h.correct, 0);
+      return { name: s.name.split(" ")[0], accuracy: total > 0 ? Math.round((correct / total) * 100) : 0, attempts: sh.length };
+    }), [history]
+  );
+
+  const dailyTrendData = useMemo(() => {
+    const days = new Map<string, { date: string; attempts: number; avgAccuracy: number; totalCorrect: number; totalQ: number }>();
+    history.forEach((h: any) => {
+      const d = new Date(h.date).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      const existing = days.get(d) || { date: d, attempts: 0, avgAccuracy: 0, totalCorrect: 0, totalQ: 0 };
+      existing.attempts++;
+      existing.totalCorrect += h.correct || 0;
+      existing.totalQ += h.total || 0;
+      days.set(d, existing);
+    });
+    return Array.from(days.values()).slice(-14).map(d => ({
+      ...d, avgAccuracy: d.totalQ > 0 ? Math.round((d.totalCorrect / d.totalQ) * 100) : 0,
+    }));
+  }, [history]);
+
+  const difficultyDistData = useMemo(() => {
+    const counts = { Easy: 0, Medium: 0, Hard: 0 };
+    history.forEach((h: any) => {
+      const d = h.difficulty;
+      if (d === "easy") counts.Easy++;
+      else if (d === "intermediate") counts.Medium++;
+      else if (d === "hard") counts.Hard++;
+      else counts.Easy++;
+    });
+    return Object.entries(counts).map(([name, value]) => ({ name, value }));
+  }, [history]);
   // ─── MCQ CRUD Handlers ───
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -704,7 +744,88 @@ const Admin = () => {
             </div>
           </div>
 
-          {/* Premium Code Management */}
+          {/* Analytics Charts */}
+          {history.length > 0 && (
+            <div className="space-y-5">
+              <h2 className="text-base font-bold text-foreground">Analytics</h2>
+
+              {/* Subject Accuracy Bar Chart */}
+              <div className="border border-border rounded-2xl p-4 bg-card">
+                <h3 className="text-sm font-bold text-foreground mb-3">Accuracy by Subject</h3>
+                <div className="h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={subjectAccuracyData} barSize={28}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="name" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+                      <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+                      <Tooltip
+                        contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 12, fontSize: 12 }}
+                        labelStyle={{ color: "hsl(var(--foreground))", fontWeight: 700 }}
+                        formatter={(value: number) => [`${value}%`, "Accuracy"]}
+                      />
+                      <Bar dataKey="accuracy" radius={[6, 6, 0, 0]}>
+                        {subjectAccuracyData.map((_, i) => (
+                          <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Daily Trend Line Chart */}
+              {dailyTrendData.length > 1 && (
+                <div className="border border-border rounded-2xl p-4 bg-card">
+                  <h3 className="text-sm font-bold text-foreground mb-3">Performance Trend</h3>
+                  <div className="h-48">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={dailyTrendData}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                        <XAxis dataKey="date" tick={{ fontSize: 9, fill: "hsl(var(--muted-foreground))" }} />
+                        <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+                        <Tooltip
+                          contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 12, fontSize: 12 }}
+                          labelStyle={{ color: "hsl(var(--foreground))", fontWeight: 700 }}
+                        />
+                        <Line type="monotone" dataKey="avgAccuracy" stroke="hsl(var(--primary))" strokeWidth={2.5} dot={{ r: 3, fill: "hsl(var(--primary))" }} name="Accuracy %" />
+                        <Line type="monotone" dataKey="attempts" stroke="hsl(var(--muted-foreground))" strokeWidth={1.5} strokeDasharray="4 4" dot={false} name="Attempts" />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              )}
+
+              {/* Difficulty Distribution Pie */}
+              <div className="border border-border rounded-2xl p-4 bg-card">
+                <h3 className="text-sm font-bold text-foreground mb-3">Quiz Difficulty Distribution</h3>
+                <div className="h-48 flex items-center justify-center">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={difficultyDistData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={45}
+                        outerRadius={70}
+                        dataKey="value"
+                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        labelLine={false}
+                      >
+                        <Cell fill="hsl(142 76% 36%)" />
+                        <Cell fill="hsl(var(--warning, 45 93% 47%))" />
+                        <Cell fill="hsl(var(--destructive))" />
+                      </Pie>
+                      <Tooltip
+                        contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 12, fontSize: 12 }}
+                        formatter={(value: number) => [value, "Quizzes"]}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="border border-border rounded-2xl p-4 bg-card">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
