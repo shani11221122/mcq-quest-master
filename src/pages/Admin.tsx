@@ -55,7 +55,7 @@ const difficultyColors: Record<Difficulty, string> = {
 
 const Admin = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, changeAdminCredentials } = useAuth();
   const [questions, setQuestions] = useState<StoredQuestion[]>([]);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<View>("dashboard");
