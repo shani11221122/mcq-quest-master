@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Search, Timer, TimerOff } from "lucide-react";
-import { subjects, getQuestionsBySubject } from "@/lib/quiz-data";
+import { subjects } from "@/lib/quiz-data";
 import type { Difficulty } from "@/lib/quiz-data";
 import PageShell from "@/components/PageShell";
 
