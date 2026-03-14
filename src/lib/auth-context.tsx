@@ -101,8 +101,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return false;
   };
 
+  const changeAdminCredentials = (currentPassword: string, newUsername: string, newPassword: string): boolean => {
+    const creds = getAdminCreds();
+    if (currentPassword !== creds.password) return false;
+    const updated: AdminCreds = {
+      username: newUsername.trim() || creds.username,
+      password: newPassword.trim() || creds.password,
+    };
+    localStorage.setItem(ADMIN_CREDS_KEY, JSON.stringify(updated));
+    // Update current session
+    if (user?.isAdmin) {
+      const updatedUser = { ...user, username: updated.username };
+      setUser(updatedUser);
+      localStorage.setItem("mdcat_user", JSON.stringify(updatedUser));
+    }
+    return true;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout, unlockPremium }}>
+    <AuthContext.Provider value={{ user, login, signup, logout, unlockPremium, changeAdminCredentials }}>
       {children}
     </AuthContext.Provider>
   );
