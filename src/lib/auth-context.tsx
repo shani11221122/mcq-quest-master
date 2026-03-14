@@ -59,8 +59,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem("mdcat_user", JSON.stringify(userData));
       return true;
     }
-    if (username === "admin" && password === "admin123") {
-      const userData: User = { username: "Admin", email: "admin@mdcat.com", isAdmin: true, isPremium: true };
+    const adminCreds = getAdminCreds();
+    if (username === adminCreds.username && password === adminCreds.password) {
+      const userData: User = { username: adminCreds.username, email: "admin@mdcat.com", isAdmin: true, isPremium: true };
       setUser(userData);
       localStorage.setItem("mdcat_user", JSON.stringify(userData));
       return true;
