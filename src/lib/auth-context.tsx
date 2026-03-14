@@ -13,12 +13,22 @@ interface AuthContextType {
   signup: (username: string, email: string, password: string) => boolean;
   logout: () => void;
   unlockPremium: (code: string) => boolean;
+  changeAdminCredentials: (currentPassword: string, newUsername: string, newPassword: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 const PREMIUM_CODE_KEY = "mdcat_premium_code";
 const DEFAULT_PREMIUM_CODE = "MDCAT2024";
+const ADMIN_CREDS_KEY = "mdcat_admin_creds";
+
+interface AdminCreds { username: string; password: string; }
+
+function getAdminCreds(): AdminCreds {
+  const saved = localStorage.getItem(ADMIN_CREDS_KEY);
+  if (saved) return JSON.parse(saved);
+  return { username: "admin", password: "admin123" };
+}
 
 function getValidCode(): string {
   return localStorage.getItem(PREMIUM_CODE_KEY) || DEFAULT_PREMIUM_CODE;
@@ -49,8 +59,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem("mdcat_user", JSON.stringify(userData));
       return true;
     }
-    if (username === "admin" && password === "admin123") {
-      const userData: User = { username: "Admin", email: "admin@mdcat.com", isAdmin: true, isPremium: true };
+    const adminCreds = getAdminCreds();
+    if (username === adminCreds.username && password === adminCreds.password) {
+      const userData: User = { username: adminCreds.username, email: "admin@mdcat.com", isAdmin: true, isPremium: true };
       setUser(userData);
       localStorage.setItem("mdcat_user", JSON.stringify(userData));
       return true;
@@ -90,8 +101,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return false;
   };
 
+  const changeAdminCredentials = (currentPassword: string, newUsername: string, newPassword: string): boolean => {
+    const creds = getAdminCreds();
+    if (currentPassword !== creds.password) return false;
+    const updated: AdminCreds = {
+      username: newUsername.trim() || creds.username,
+      password: newPassword.trim() || creds.password,
+    };
+    localStorage.setItem(ADMIN_CREDS_KEY, JSON.stringify(updated));
+    // Update current session
+    if (user?.isAdmin) {
+      const updatedUser = { ...user, username: updated.username };
+      setUser(updatedUser);
+      localStorage.setItem("mdcat_user", JSON.stringify(updatedUser));
+    }
+    return true;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout, unlockPremium }}>
+    <AuthContext.Provider value={{ user, login, signup, logout, unlockPremium, changeAdminCredentials }}>
       {children}
     </AuthContext.Provider>
   );
