@@ -125,6 +125,45 @@ const Admin = () => {
     quizAttempts: history.length,
   };
 
+  // ─── Analytics Data ───
+
+  const CHART_COLORS = ["hsl(var(--primary))", "hsl(var(--destructive))", "hsl(var(--warning, 45 93% 47%))", "hsl(142 76% 36%)", "hsl(262 83% 58%)"];
+
+  const subjectAccuracyData = useMemo(() =>
+    subjects.map(s => {
+      const sh = history.filter((h: any) => h.subject?.toLowerCase() === s.name?.toLowerCase() || h.subject === s.id);
+      const total = sh.reduce((a: number, h: any) => a + h.total, 0);
+      const correct = sh.reduce((a: number, h: any) => a + h.correct, 0);
+      return { name: s.name.split(" ")[0], accuracy: total > 0 ? Math.round((correct / total) * 100) : 0, attempts: sh.length };
+    }), [history]
+  );
+
+  const dailyTrendData = useMemo(() => {
+    const days = new Map<string, { date: string; attempts: number; avgAccuracy: number; totalCorrect: number; totalQ: number }>();
+    history.forEach((h: any) => {
+      const d = new Date(h.date).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      const existing = days.get(d) || { date: d, attempts: 0, avgAccuracy: 0, totalCorrect: 0, totalQ: 0 };
+      existing.attempts++;
+      existing.totalCorrect += h.correct || 0;
+      existing.totalQ += h.total || 0;
+      days.set(d, existing);
+    });
+    return Array.from(days.values()).slice(-14).map(d => ({
+      ...d, avgAccuracy: d.totalQ > 0 ? Math.round((d.totalCorrect / d.totalQ) * 100) : 0,
+    }));
+  }, [history]);
+
+  const difficultyDistData = useMemo(() => {
+    const counts = { Easy: 0, Medium: 0, Hard: 0 };
+    history.forEach((h: any) => {
+      const d = h.difficulty;
+      if (d === "easy") counts.Easy++;
+      else if (d === "intermediate") counts.Medium++;
+      else if (d === "hard") counts.Hard++;
+      else counts.Easy++;
+    });
+    return Object.entries(counts).map(([name, value]) => ({ name, value }));
+  }, [history]);
   // ─── MCQ CRUD Handlers ───
 
   const handleSubmit = async (e: React.FormEvent) => {
