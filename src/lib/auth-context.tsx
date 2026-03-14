@@ -20,6 +20,15 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 const PREMIUM_CODE_KEY = "mdcat_premium_code";
 const DEFAULT_PREMIUM_CODE = "MDCAT2024";
+const ADMIN_CREDS_KEY = "mdcat_admin_creds";
+
+interface AdminCreds { username: string; password: string; }
+
+function getAdminCreds(): AdminCreds {
+  const saved = localStorage.getItem(ADMIN_CREDS_KEY);
+  if (saved) return JSON.parse(saved);
+  return { username: "admin", password: "admin123" };
+}
 
 function getValidCode(): string {
   return localStorage.getItem(PREMIUM_CODE_KEY) || DEFAULT_PREMIUM_CODE;
