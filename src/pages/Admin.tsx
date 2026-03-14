@@ -79,6 +79,14 @@ const Admin = () => {
   const [premiumCode, setPremiumCodeState] = useState(getPremiumCode());
   const [showPremiumEdit, setShowPremiumEdit] = useState(false);
 
+  // Credential change state
+  const [showCredChange, setShowCredChange] = useState(false);
+  const [credCurrentPass, setCredCurrentPass] = useState("");
+  const [credNewUsername, setCredNewUsername] = useState("");
+  const [credNewPassword, setCredNewPassword] = useState("");
+  const [credConfirmPassword, setCredConfirmPassword] = useState("");
+  const [credShowPasswords, setCredShowPasswords] = useState(false);
+
   useEffect(() => {
     if (!user?.isAdmin) { navigate("/home"); return; }
     (async () => {
