@@ -69,7 +69,7 @@ const Result = () => {
             <p className="text-xs text-muted-foreground font-medium mt-0.5">Incorrect</p>
           </div>
           <div className="glass-card p-4 text-center">
-            <p className="text-2xl font-bold font-display text-foreground">{result.total}</p>
+            <p className="text-2xl font-bold font-display text-foreground">10</p>
             <p className="text-xs text-muted-foreground font-medium mt-0.5">Total</p>
           </div>
           <div className="glass-card p-4 text-center">
