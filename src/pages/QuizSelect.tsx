@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Search, Timer, TimerOff } from "lucide-react";
-import { subjects, getQuestionsBySubject } from "@/lib/quiz-data";
+import { subjects } from "@/lib/quiz-data";
 import type { Difficulty } from "@/lib/quiz-data";
 import PageShell from "@/components/PageShell";
 
@@ -92,7 +92,6 @@ const QuizSelect = () => {
 
       <div className="px-5 grid grid-cols-2 gap-3 pb-4">
         {filteredSubjects.map((s) => {
-          const qCount = getQuestionsBySubject(s.id, difficulty === "all" ? undefined : difficulty).length;
           const subjectHistory = history.filter((h: any) => h.subject?.toLowerCase() === s.name?.toLowerCase() || h.subject === s.id);
           const totalAttempts = subjectHistory.reduce((acc: number, h: any) => acc + h.total, 0);
           const totalCorrect = subjectHistory.reduce((acc: number, h: any) => acc + h.correct, 0);
@@ -106,7 +105,7 @@ const QuizSelect = () => {
             >
               <div className="text-3xl mb-3">{subjectIcons[s.id] || s.icon}</div>
               <p className="font-semibold text-sm text-foreground">{s.name}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{qCount} questions</p>
+              <p className="text-xs text-muted-foreground mt-0.5">10 MCQs per quiz</p>
               <div className="mt-3 h-1.5 bg-muted rounded-full overflow-hidden">
                 <div className="h-full bg-primary rounded-full transition-all duration-200" style={{ width: `${progress}%` }} />
               </div>
