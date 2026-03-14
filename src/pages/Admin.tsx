@@ -726,7 +726,88 @@ const Admin = () => {
             )}
           </div>
 
-          {/* Recently Added */}
+          {/* Admin Credentials */}
+          <div className="border border-border rounded-2xl p-4 bg-card">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <UserCog size={16} className="text-primary" />
+                <h3 className="text-sm font-bold text-foreground">Admin Credentials</h3>
+              </div>
+              <button onClick={() => { setShowCredChange(!showCredChange); setCredCurrentPass(""); setCredNewUsername(""); setCredNewPassword(""); setCredConfirmPassword(""); }}
+                className="text-xs text-primary font-semibold">{showCredChange ? "Cancel" : "Change"}</button>
+            </div>
+            {showCredChange ? (
+              <div className="mt-3 space-y-3">
+                <div>
+                  <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">Current Password</label>
+                  <div className="relative">
+                    <input
+                      type={credShowPasswords ? "text" : "password"}
+                      value={credCurrentPass}
+                      onChange={e => setCredCurrentPass(e.target.value)}
+                      placeholder="Enter current password"
+                      className="w-full h-9 rounded-xl border border-input bg-background px-3 pr-10 text-sm text-foreground placeholder:text-muted-foreground"
+                    />
+                    <button type="button" onClick={() => setCredShowPasswords(!credShowPasswords)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                      {credShowPasswords ? <EyeOff size={14} /> : <Eye size={14} />}
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">New Username (optional)</label>
+                  <input
+                    type="text"
+                    value={credNewUsername}
+                    onChange={e => setCredNewUsername(e.target.value)}
+                    placeholder="Leave empty to keep current"
+                    className="w-full h-9 rounded-xl border border-input bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">New Password (optional)</label>
+                  <input
+                    type={credShowPasswords ? "text" : "password"}
+                    value={credNewPassword}
+                    onChange={e => setCredNewPassword(e.target.value)}
+                    placeholder="Leave empty to keep current"
+                    className="w-full h-9 rounded-xl border border-input bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground"
+                  />
+                </div>
+                {credNewPassword && (
+                  <div>
+                    <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">Confirm New Password</label>
+                    <input
+                      type={credShowPasswords ? "text" : "password"}
+                      value={credConfirmPassword}
+                      onChange={e => setCredConfirmPassword(e.target.value)}
+                      placeholder="Re-enter new password"
+                      className="w-full h-9 rounded-xl border border-input bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground"
+                    />
+                  </div>
+                )}
+                <button
+                  onClick={() => {
+                    if (!credCurrentPass) { toast.error("Current password is required"); return; }
+                    if (credNewPassword && credNewPassword !== credConfirmPassword) { toast.error("Passwords do not match"); return; }
+                    if (credNewPassword && credNewPassword.length < 6) { toast.error("Password must be at least 6 characters"); return; }
+                    const success = changeAdminCredentials(credCurrentPass, credNewUsername, credNewPassword);
+                    if (success) {
+                      toast.success("Credentials updated successfully");
+                      setShowCredChange(false);
+                    } else {
+                      toast.error("Current password is incorrect");
+                    }
+                  }}
+                  className="w-full h-10 bg-primary text-primary-foreground rounded-xl text-xs font-bold"
+                >
+                  Update Credentials
+                </button>
+              </div>
+            ) : (
+              <p className="mt-2 text-xs text-muted-foreground">Change your admin username and password</p>
+            )}
+          </div>
+
           {recentQuestions.length > 0 && (
             <div>
               <h2 className="text-base font-bold text-foreground mb-3">Recently Added</h2>
