@@ -283,10 +283,33 @@ const Admin = () => {
 
   // ─── Filtered questions for subject view ───
 
-  const subjectQuestions = questions
-    .filter(q => q.subject === activeSubject)
-    .filter(q => filterDifficulty === "all" || q.difficulty === filterDifficulty)
-    .filter(q => !search || q.question.toLowerCase().includes(search.toLowerCase()));
+  // Grouped + ordered by difficulty (Easy → Medium → Hard) so numbering stays organized.
+  const subjectQuestions = (() => {
+    const order: Difficulty[] = ["easy", "intermediate", "hard"];
+    const base = questions
+      .filter(q => q.subject === activeSubject)
+      .filter(q => filterDifficulty === "all" || q.difficulty === filterDifficulty)
+      .filter(q => !search || q.question.toLowerCase().includes(search.toLowerCase()));
+    return base.sort((a, b) => {
+      const da = order.indexOf(a.difficulty);
+      const db = order.indexOf(b.difficulty);
+      if (da !== db) return da - db;
+      return a.createdAt - b.createdAt;
+    });
+  })();
+
+  const groupedSubjectQuestions = (() => {
+    const groups: { difficulty: Difficulty; label: string; items: StoredQuestion[] }[] = [
+      { difficulty: "easy", label: "Easy", items: [] },
+      { difficulty: "intermediate", label: "Medium", items: [] },
+      { difficulty: "hard", label: "Hard", items: [] },
+    ];
+    subjectQuestions.forEach(q => {
+      const g = groups.find(g => g.difficulty === q.difficulty);
+      if (g) g.items.push(q);
+    });
+    return groups.filter(g => g.items.length > 0);
+  })();
 
   // ─── Admin Logout ───
 
