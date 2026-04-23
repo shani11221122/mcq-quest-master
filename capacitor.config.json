@@ -1,0 +1,26 @@
+{
+  "appId": "app.lovable.b0831e5e786948d8abfc175efaf53aa7",
+  "appName": "mcq-quest-master",
+  "webDir": "dist",
+  "server": {
+    "url": "https://b0831e5e-7869-48d8-abfc-175efaf53aa7.lovableproject.com?forceHideBadge=true",
+    "cleartext": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#6366F1",
+      "showSpinner": false,
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_CROP"
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#6366F1"
+    },
+    "Keyboard": {
+      "resize": "body",
+      "resizeOnFullScreen": true
+    }
+  }
+}
