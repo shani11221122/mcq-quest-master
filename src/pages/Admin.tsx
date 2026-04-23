@@ -283,10 +283,33 @@ const Admin = () => {
 
   // ─── Filtered questions for subject view ───
 
-  const subjectQuestions = questions
-    .filter(q => q.subject === activeSubject)
-    .filter(q => filterDifficulty === "all" || q.difficulty === filterDifficulty)
-    .filter(q => !search || q.question.toLowerCase().includes(search.toLowerCase()));
+  // Grouped + ordered by difficulty (Easy → Medium → Hard) so numbering stays organized.
+  const subjectQuestions = (() => {
+    const order: Difficulty[] = ["easy", "intermediate", "hard"];
+    const base = questions
+      .filter(q => q.subject === activeSubject)
+      .filter(q => filterDifficulty === "all" || q.difficulty === filterDifficulty)
+      .filter(q => !search || q.question.toLowerCase().includes(search.toLowerCase()));
+    return base.sort((a, b) => {
+      const da = order.indexOf(a.difficulty);
+      const db = order.indexOf(b.difficulty);
+      if (da !== db) return da - db;
+      return a.createdAt - b.createdAt;
+    });
+  })();
+
+  const groupedSubjectQuestions = (() => {
+    const groups: { difficulty: Difficulty; label: string; items: StoredQuestion[] }[] = [
+      { difficulty: "easy", label: "Easy", items: [] },
+      { difficulty: "intermediate", label: "Medium", items: [] },
+      { difficulty: "hard", label: "Hard", items: [] },
+    ];
+    subjectQuestions.forEach(q => {
+      const g = groups.find(g => g.difficulty === q.difficulty);
+      if (g) g.items.push(q);
+    });
+    return groups.filter(g => g.items.length > 0);
+  })();
 
   // ─── Admin Logout ───
 
@@ -580,52 +603,66 @@ const Admin = () => {
                 <p className="text-muted-foreground/60 text-xs mt-1">Add questions or seed defaults</p>
               </div>
             ) : (
-              <div className="space-y-2">
-                {subjectQuestions.map((q) => (
-                  <div key={q.id} className="border border-border rounded-xl p-3 bg-card">
-                    <div className="flex justify-between items-start gap-2">
-                      <p className="text-sm font-semibold text-foreground flex-1 leading-snug">{q.question}</p>
-                      <div className="flex gap-1 shrink-0">
-                        <button onClick={() => startEdit(q)}
-                          className="w-7 h-7 flex items-center justify-center rounded-lg bg-primary/10 text-primary active:scale-90 transition-transform duration-100">
-                          <Pencil size={13} />
-                        </button>
-                        {deleteConfirm === q.id ? (
-                          <div className="flex gap-1">
-                            <button onClick={() => handleDelete(q.id)}
-                              className="w-7 h-7 flex items-center justify-center rounded-lg bg-destructive text-destructive-foreground active:scale-90 transition-transform duration-100">
-                              <Check size={13} />
-                            </button>
-                            <button onClick={() => setDeleteConfirm(null)}
-                              className="w-7 h-7 flex items-center justify-center rounded-lg bg-secondary text-secondary-foreground active:scale-90 transition-transform duration-100">
-                              <X size={13} />
-                            </button>
-                          </div>
-                        ) : (
-                          <button onClick={() => setDeleteConfirm(q.id)}
-                            className="w-7 h-7 flex items-center justify-center rounded-lg bg-destructive/10 text-destructive active:scale-90 transition-transform duration-100">
-                            <Trash2 size={13} />
-                          </button>
-                        )}
+              <div className="space-y-5">
+                {groupedSubjectQuestions.map((group) => (
+                  <div key={group.difficulty} className="space-y-2">
+                    <div className="flex items-center justify-between sticky top-0 z-10 bg-background/95 backdrop-blur-sm py-1.5 -mx-1 px-1">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider ${difficultyColors[group.difficulty]}`}>
+                          {group.label}
+                        </span>
+                        <span className="text-[11px] text-muted-foreground font-semibold">
+                          {group.items.length} question{group.items.length !== 1 ? "s" : ""}
+                        </span>
                       </div>
                     </div>
 
-                    <div className="mt-2 grid grid-cols-2 gap-1">
-                      {q.options.map((opt, i) => (
-                        <p key={i} className={`text-[11px] px-2 py-1 rounded-lg truncate ${
-                          i === q.correctAnswer
-                            ? "bg-primary/10 text-primary font-bold"
-                            : "bg-secondary/50 text-muted-foreground"}`}>
-                          {String.fromCharCode(65 + i)}. {opt}
-                        </p>
-                      ))}
-                    </div>
+                    {group.items.map((q, idx) => (
+                      <div key={q.id} className="border border-border rounded-xl p-3 bg-card">
+                        <div className="flex justify-between items-start gap-2">
+                          <div className="flex gap-2 flex-1 min-w-0">
+                            <span className="shrink-0 w-7 h-7 rounded-lg bg-muted text-muted-foreground text-xs font-bold flex items-center justify-center">
+                              {idx + 1}
+                            </span>
+                            <p className="text-sm font-semibold text-foreground flex-1 leading-snug pt-0.5">{q.question}</p>
+                          </div>
+                          <div className="flex gap-1 shrink-0">
+                            <button onClick={() => startEdit(q)}
+                              className="w-7 h-7 flex items-center justify-center rounded-lg bg-primary/10 text-primary active:scale-90 transition-transform duration-100">
+                              <Pencil size={13} />
+                            </button>
+                            {deleteConfirm === q.id ? (
+                              <div className="flex gap-1">
+                                <button onClick={() => handleDelete(q.id)}
+                                  className="w-7 h-7 flex items-center justify-center rounded-lg bg-destructive text-destructive-foreground active:scale-90 transition-transform duration-100">
+                                  <Check size={13} />
+                                </button>
+                                <button onClick={() => setDeleteConfirm(null)}
+                                  className="w-7 h-7 flex items-center justify-center rounded-lg bg-secondary text-secondary-foreground active:scale-90 transition-transform duration-100">
+                                  <X size={13} />
+                                </button>
+                              </div>
+                            ) : (
+                              <button onClick={() => setDeleteConfirm(q.id)}
+                                className="w-7 h-7 flex items-center justify-center rounded-lg bg-destructive/10 text-destructive active:scale-90 transition-transform duration-100">
+                                <Trash2 size={13} />
+                              </button>
+                            )}
+                          </div>
+                        </div>
 
-                    <div className="flex gap-1.5 mt-2">
-                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full capitalize ${difficultyColors[q.difficulty]}`}>
-                        {q.difficulty === "intermediate" ? "Medium" : q.difficulty}
-                      </span>
-                    </div>
+                        <div className="mt-2 grid grid-cols-2 gap-1 pl-9">
+                          {q.options.map((opt, i) => (
+                            <p key={i} className={`text-[11px] px-2 py-1 rounded-lg truncate ${
+                              i === q.correctAnswer
+                                ? "bg-primary/10 text-primary font-bold"
+                                : "bg-secondary/50 text-muted-foreground"}`}>
+                              {String.fromCharCode(65 + i)}. {opt}
+                            </p>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 ))}
               </div>
