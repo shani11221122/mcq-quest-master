@@ -68,19 +68,29 @@ const QuizSelect = () => {
             {timedMode ? "Timed" : "No Timer"}
           </button>
           <div className="w-px h-6 bg-border shrink-0" />
-          {difficulties.map((d) => (
-            <button
-              key={d.key}
-              onClick={() => setDifficulty(d.key)}
-              className={`px-3 py-2 rounded-xl text-xs font-semibold transition-colors duration-100 shrink-0 ${
-                difficulty === d.key
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "bg-card border border-border text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {d.label}
-            </button>
-          ))}
+          {difficulties.map((d) => {
+            const activeCls =
+              d.key === "easy"
+                ? "bg-success text-success-foreground shadow-sm"
+                : d.key === "intermediate"
+                ? "bg-warning text-warning-foreground shadow-sm"
+                : d.key === "hard"
+                ? "bg-destructive text-destructive-foreground shadow-sm"
+                : "bg-primary text-primary-foreground shadow-sm";
+            return (
+              <button
+                key={d.key}
+                onClick={() => setDifficulty(d.key)}
+                className={`px-3 py-2 rounded-xl text-xs font-semibold transition-colors duration-100 shrink-0 ${
+                  difficulty === d.key
+                    ? activeCls
+                    : "bg-card border border-border text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {d.label}
+              </button>
+            );
+          })}
         </div>
 
         {timedMode && (
