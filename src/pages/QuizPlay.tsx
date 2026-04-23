@@ -157,10 +157,21 @@ const QuizPlay = () => {
         </button>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-foreground truncate">{subject?.name || "Quiz"}</p>
-          <p className="text-[10px] text-muted-foreground capitalize">
-            {difficulty ? `${difficulty} level` : "All levels"}
-            {isTimed && " • Timed"}
-          </p>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            {difficulty && (
+              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider ${
+                difficulty === "easy"
+                  ? "bg-success/10 text-success"
+                  : difficulty === "intermediate"
+                  ? "bg-warning/10 text-warning"
+                  : "bg-destructive/10 text-destructive"
+              }`}>
+                {difficulty === "intermediate" ? "Medium" : difficulty}
+              </span>
+            )}
+            {!difficulty && <span className="text-[10px] text-muted-foreground">All levels</span>}
+            {isTimed && <span className="text-[10px] text-muted-foreground">• Timed</span>}
+          </div>
         </div>
 
         {isTimed ? (
