@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Plus, Trash2, Pencil, Search, X, Check, ChevronDown,
   Database, Download, Upload, KeyRound, BookOpen, BarChart3,
-  Shield, LogOut, ChevronRight, Layers, Clock, TrendingUp, Eye, EyeOff, UserCog, Users
+  Shield, LogOut, ChevronRight, Layers, Clock, TrendingUp, Eye, EyeOff, UserCog, Users, Activity
 } from "lucide-react";
 import AdminUsers from "@/components/AdminUsers";
+import AdminMonitoring from "@/components/AdminMonitoring";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
 import { getPremiumCode, setPremiumCode } from "@/lib/auth-context";
@@ -14,6 +15,7 @@ import {
   getAllQuestions, addQuestion, updateQuestion, deleteQuestion,
   importQuestions, migrateFromLocalStorage, type StoredQuestion
 } from "@/lib/indexeddb";
+import { parseQuizJson, buildExportPayload, downloadJson } from "@/lib/quiz-schema";
 import { toast } from "sonner";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, PieChart, Pie, Cell } from "recharts";
 
