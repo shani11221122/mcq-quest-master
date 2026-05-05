@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Moon, Sun, Monitor, LogOut, KeyRound, ChevronRight } from "lucide-react";
+import { ArrowLeft, Moon, Sun, Monitor, LogOut, KeyRound, ChevronRight, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { useTheme } from "@/lib/theme-context";
 import PageShell from "@/components/PageShell";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 const themeOptions = [
   { key: "light" as const, label: "Light", icon: Sun },
@@ -23,12 +26,48 @@ const rules = [
 
 const Settings = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, changePassword } = useAuth();
   const { theme, setTheme } = useTheme();
+
+  const [pwOpen, setPwOpen] = useState(false);
+  const [current, setCurrent] = useState("");
+  const [next, setNext] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNext, setShowNext] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const resetPwForm = () => {
+    setCurrent(""); setNext(""); setConfirm("");
+    setShowCurrent(false); setShowNext(false);
+  };
 
   const handleLogout = () => {
     logout();
     navigate("/login");
+  };
+
+  const handleChangePassword = async () => {
+    if (!current || !next || !confirm) {
+      toast.error("Please fill all fields");
+      return;
+    }
+    if (next !== confirm) {
+      toast.error("New passwords do not match");
+      return;
+    }
+    setSubmitting(true);
+    // simulate API latency for UX
+    await new Promise((r) => setTimeout(r, 400));
+    const res = changePassword(current, next);
+    setSubmitting(false);
+    if (!res.ok) {
+      toast.error(res.error || "Failed to change password");
+      return;
+    }
+    toast.success("Password updated successfully");
+    resetPwForm();
+    setPwOpen(false);
   };
 
   return (
@@ -78,7 +117,7 @@ const Settings = () => {
         <div className="mb-6">
           <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-1">Account</h2>
           <div className="glass-card overflow-hidden divide-y divide-border/50">
-            <button className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-muted/50 transition-colors duration-100">
+            <button onClick={() => setPwOpen(true)} className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-muted/50 transition-colors duration-100">
               <KeyRound size={18} className="text-muted-foreground" />
               <span className="flex-1 text-left text-sm font-medium text-foreground">Change Password</span>
               <ChevronRight size={16} className="text-muted-foreground" />
@@ -104,6 +143,72 @@ const Settings = () => {
           </div>
         </div>
       </div>
+
+      <Dialog open={pwOpen} onOpenChange={(o) => { setPwOpen(o); if (!o) resetPwForm(); }}>
+        <DialogContent className="max-w-sm rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>Change Password</DialogTitle>
+            <DialogDescription>
+              Enter your current password and choose a new one. Min 8 characters with letters and numbers.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3 py-2">
+            <div className="relative">
+              <input
+                type={showCurrent ? "text" : "password"}
+                value={current}
+                onChange={(e) => setCurrent(e.target.value)}
+                placeholder="Current password"
+                className="w-full h-11 px-4 pr-10 rounded-xl bg-muted border border-border text-sm outline-none focus:ring-2 focus:ring-primary"
+                autoComplete="current-password"
+              />
+              <button type="button" onClick={() => setShowCurrent(!showCurrent)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                {showCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+            <div className="relative">
+              <input
+                type={showNext ? "text" : "password"}
+                value={next}
+                onChange={(e) => setNext(e.target.value)}
+                placeholder="New password"
+                className="w-full h-11 px-4 pr-10 rounded-xl bg-muted border border-border text-sm outline-none focus:ring-2 focus:ring-primary"
+                autoComplete="new-password"
+              />
+              <button type="button" onClick={() => setShowNext(!showNext)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                {showNext ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+            <input
+              type={showNext ? "text" : "password"}
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              placeholder="Confirm new password"
+              className="w-full h-11 px-4 rounded-xl bg-muted border border-border text-sm outline-none focus:ring-2 focus:ring-primary"
+              autoComplete="new-password"
+            />
+          </div>
+
+          <DialogFooter className="flex-row gap-2">
+            <button
+              onClick={() => setPwOpen(false)}
+              disabled={submitting}
+              className="flex-1 h-11 rounded-xl bg-muted text-sm font-semibold text-foreground hover:bg-muted/70 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleChangePassword}
+              disabled={submitting}
+              className="flex-1 h-11 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              {submitting && <Loader2 size={14} className="animate-spin" />}
+              Update
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </PageShell>
   );
 };
