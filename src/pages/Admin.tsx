@@ -821,6 +821,10 @@ const Admin = () => {
                 className="flex items-center gap-1.5 bg-primary text-primary-foreground px-4 py-2.5 rounded-xl text-xs font-bold active:scale-95 transition-transform duration-100">
                 <Users size={14} /> Manage Users
               </button>
+              <button onClick={() => setView("monitoring")}
+                className="flex items-center gap-1.5 bg-accent text-accent-foreground px-4 py-2.5 rounded-xl text-xs font-bold active:scale-95 transition-transform duration-100">
+                <Activity size={14} /> Live Monitoring
+              </button>
               <button onClick={handleSeedDefaults}
                 className="flex items-center gap-1.5 bg-secondary text-secondary-foreground px-4 py-2.5 rounded-xl text-xs font-bold active:scale-95 transition-transform duration-100">
                 <Database size={14} /> Seed Defaults
