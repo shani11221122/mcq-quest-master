@@ -184,9 +184,11 @@ const Admin = () => {
       if (editingId) {
         const existing = questions.find(q => q.id === editingId)!;
         await updateQuestion({ ...existing, ...form });
+        logActivity("mcq_update", `Updated MCQ in ${form.subject} (${form.difficulty}): "${form.question.slice(0, 60)}${form.question.length > 60 ? "…" : ""}"`, { id: editingId, subject: form.subject });
         toast.success("Question updated");
       } else {
         await addQuestion(form);
+        logActivity("mcq_add", `Added MCQ to ${form.subject} (${form.difficulty}): "${form.question.slice(0, 60)}${form.question.length > 60 ? "…" : ""}"`, { subject: form.subject });
         toast.success("Question added");
       }
       await reload();
@@ -196,7 +198,9 @@ const Admin = () => {
 
   const handleDelete = async (id: string) => {
     try {
+      const q = questions.find(x => x.id === id);
       await deleteQuestion(id);
+      if (q) logActivity("mcq_delete", `Deleted MCQ from ${q.subject} (${q.difficulty}): "${q.question.slice(0, 60)}${q.question.length > 60 ? "…" : ""}"`, { id, subject: q.subject });
       toast.success("Question deleted");
       setDeleteConfirm(null);
       await reload();
