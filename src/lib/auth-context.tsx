@@ -130,7 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (user) {
         const updated = { ...user, isPremium: true };
         setUser(updated);
-        localStorage.setItem("mdcat_user", JSON.stringify(updated));
+        persistSession(updated);
         // Also update in users list
         const users = JSON.parse(localStorage.getItem("mdcat_users") || "[]");
         const idx = users.findIndex((u: any) => u.username === user.username);
