@@ -45,6 +45,7 @@ function loadSession(): User | null {
 
 interface AuthContextType {
   user: User | null;
+  ready: boolean;
   login: (username: string, password: string) => boolean;
   signup: (username: string, email: string, password: string) => boolean;
   logout: () => void;
