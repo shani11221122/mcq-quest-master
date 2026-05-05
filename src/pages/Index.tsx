@@ -1,9 +1,20 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import puzzleLogo from "@/assets/puzzle-logo.png";
+import { useAuth } from "@/lib/auth-context";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { user, ready } = useAuth();
+
+  useEffect(() => {
+    if (ready && user) {
+      navigate(user.isAdmin ? "/admin" : "/home", { replace: true });
+    }
+  }, [ready, user, navigate]);
+
+  if (!ready || user) return null;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background px-6">
