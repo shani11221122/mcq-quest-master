@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
@@ -10,8 +10,13 @@ const Signup = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { signup } = useAuth();
+  const { signup, user, ready } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (ready && user) navigate(user.isAdmin ? "/admin" : "/home", { replace: true });
+  }, [ready, user, navigate]);
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

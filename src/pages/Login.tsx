@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
@@ -9,8 +9,13 @@ import puzzleLogo from "@/assets/puzzle-logo.png";
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useAuth();
+  const { login, user, ready } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (ready && user) navigate(user.isAdmin ? "/admin" : "/home", { replace: true });
+  }, [ready, user, navigate]);
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

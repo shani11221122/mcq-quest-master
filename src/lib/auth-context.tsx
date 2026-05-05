@@ -7,8 +7,45 @@ interface User {
   isPremium: boolean;
 }
 
+const SESSION_KEY = "mdcat_session";
+const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+interface StoredSession { user: User; expiresAt: number; }
+
+function persistSession(user: User) {
+  const session: StoredSession = { user, expiresAt: Date.now() + SESSION_DURATION_MS };
+  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  localStorage.setItem("mdcat_user", JSON.stringify(user)); // backward compat
+}
+
+function loadSession(): User | null {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (raw) {
+      const s: StoredSession = JSON.parse(raw);
+      if (s.expiresAt && s.expiresAt > Date.now()) {
+        // sliding renewal: extend on each load
+        persistSession(s.user);
+        return s.user;
+      }
+      localStorage.removeItem(SESSION_KEY);
+      localStorage.removeItem("mdcat_user");
+      return null;
+    }
+    // legacy fallback
+    const legacy = localStorage.getItem("mdcat_user");
+    if (legacy) {
+      const u = JSON.parse(legacy);
+      persistSession(u);
+      return u;
+    }
+  } catch {}
+  return null;
+}
+
 interface AuthContextType {
   user: User | null;
+  ready: boolean;
   login: (username: string, password: string) => boolean;
   signup: (username: string, email: string, password: string) => boolean;
   logout: () => void;
@@ -44,10 +81,12 @@ export function getPremiumCode(): string {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem("mdcat_user");
-    if (saved) setUser(JSON.parse(saved));
+    const restored = loadSession();
+    if (restored) setUser(restored);
+    setReady(true);
   }, []);
 
   const login = (username: string, password: string): boolean => {
@@ -56,14 +95,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (found) {
       const userData: User = { username: found.username, email: found.email, isAdmin: found.isAdmin || false, isPremium: found.isPremium || false };
       setUser(userData);
-      localStorage.setItem("mdcat_user", JSON.stringify(userData));
+      persistSession(userData);
       return true;
     }
     const adminCreds = getAdminCreds();
     if (username === adminCreds.username && password === adminCreds.password) {
       const userData: User = { username: adminCreds.username, email: "admin@mdcat.com", isAdmin: true, isPremium: true };
       setUser(userData);
-      localStorage.setItem("mdcat_user", JSON.stringify(userData));
+      persistSession(userData);
       return true;
     }
     return false;
@@ -76,12 +115,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("mdcat_users", JSON.stringify(users));
     const userData: User = { username, email, isAdmin: false, isPremium: false };
     setUser(userData);
-    localStorage.setItem("mdcat_user", JSON.stringify(userData));
+    persistSession(userData);
     return true;
   };
 
   const logout = () => {
     setUser(null);
+    localStorage.removeItem(SESSION_KEY);
     localStorage.removeItem("mdcat_user");
   };
 
@@ -90,7 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (user) {
         const updated = { ...user, isPremium: true };
         setUser(updated);
-        localStorage.setItem("mdcat_user", JSON.stringify(updated));
+        persistSession(updated);
         // Also update in users list
         const users = JSON.parse(localStorage.getItem("mdcat_users") || "[]");
         const idx = users.findIndex((u: any) => u.username === user.username);
@@ -113,13 +153,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (user?.isAdmin) {
       const updatedUser = { ...user, username: updated.username };
       setUser(updatedUser);
-      localStorage.setItem("mdcat_user", JSON.stringify(updatedUser));
+      persistSession(updatedUser);
     }
     return true;
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout, unlockPremium, changeAdminCredentials }}>
+    <AuthContext.Provider value={{ user, ready, login, signup, logout, unlockPremium, changeAdminCredentials }}>
       {children}
     </AuthContext.Provider>
   );
