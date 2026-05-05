@@ -7,6 +7,42 @@ interface User {
   isPremium: boolean;
 }
 
+const SESSION_KEY = "mdcat_session";
+const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+interface StoredSession { user: User; expiresAt: number; }
+
+function persistSession(user: User) {
+  const session: StoredSession = { user, expiresAt: Date.now() + SESSION_DURATION_MS };
+  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  localStorage.setItem("mdcat_user", JSON.stringify(user)); // backward compat
+}
+
+function loadSession(): User | null {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (raw) {
+      const s: StoredSession = JSON.parse(raw);
+      if (s.expiresAt && s.expiresAt > Date.now()) {
+        // sliding renewal: extend on each load
+        persistSession(s.user);
+        return s.user;
+      }
+      localStorage.removeItem(SESSION_KEY);
+      localStorage.removeItem("mdcat_user");
+      return null;
+    }
+    // legacy fallback
+    const legacy = localStorage.getItem("mdcat_user");
+    if (legacy) {
+      const u = JSON.parse(legacy);
+      persistSession(u);
+      return u;
+    }
+  } catch {}
+  return null;
+}
+
 interface AuthContextType {
   user: User | null;
   login: (username: string, password: string) => boolean;
