@@ -356,6 +356,25 @@ const Admin = () => {
     return <AdminUsers onBack={() => setView("dashboard")} />;
   }
 
+  if (view === "monitoring") {
+    return (
+      <div className="h-dvh flex flex-col bg-background">
+        <div className="px-5 pt-5 pb-3 flex items-center gap-3 border-b border-border">
+          <button onClick={() => setView("dashboard")} className="p-2 -ml-2 active:scale-95 transition-transform duration-100">
+            <ArrowLeft size={20} />
+          </button>
+          <div className="flex-1">
+            <h1 className="text-base font-bold text-foreground">Live Monitoring</h1>
+            <p className="text-[11px] text-muted-foreground">Online users and activity</p>
+          </div>
+        </div>
+        <div className="flex-1 overflow-y-auto px-5 py-5">
+          <AdminMonitoring />
+        </div>
+      </div>
+    );
+  }
+
   if (view === "batch") {
     const entry = batchEntries[currentBatchIdx];
     const filledCount = batchEntries.filter(e => e.question.trim() && e.options.every(o => o.trim())).length;
