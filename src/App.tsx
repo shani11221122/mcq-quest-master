@@ -26,6 +26,30 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+const AppRoutes = () => {
+  usePresenceHeartbeat();
+  return (
+    <Routes>
+      <Route path="/" element={<Index />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/home" element={<Home />} />
+      <Route path="/quiz" element={<QuizSelect />} />
+      <Route path="/quiz/:subjectId" element={<QuizPlay />} />
+      <Route path="/result" element={<Result />} />
+      <Route path="/result/answers" element={<ViewAnswers />} />
+      <Route path="/history" element={<History />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="/rules" element={<Rules />} />
+      <Route path="/mock-test" element={<MockTest />} />
+      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
@@ -34,24 +58,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/home" element={<Home />} />
-              <Route path="/quiz" element={<QuizSelect />} />
-              <Route path="/quiz/:subjectId" element={<QuizPlay />} />
-              <Route path="/result" element={<Result />} />
-              <Route path="/result/answers" element={<ViewAnswers />} />
-              <Route path="/history" element={<History />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/rules" element={<Rules />} />
-              <Route path="/mock-test" element={<MockTest />} />
-              <Route path="/admin/login" element={<AdminLogin />} />
-              <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <AppRoutes />
           </BrowserRouter>
         </AuthProvider>
       </TooltipProvider>
