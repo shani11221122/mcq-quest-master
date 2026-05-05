@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Moon, Sun, Monitor, LogOut, KeyRound, ChevronRight } from "lucide-react";
+import { ArrowLeft, Moon, Sun, Monitor, LogOut, KeyRound, ChevronRight, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { useTheme } from "@/lib/theme-context";
 import PageShell from "@/components/PageShell";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 const themeOptions = [
   { key: "light" as const, label: "Light", icon: Sun },
