@@ -947,7 +947,7 @@ const Admin = () => {
               <div className="flex gap-2 mt-3">
                 <input value={premiumCode} onChange={e => setPremiumCodeState(e.target.value)}
                   className="flex-1 h-9 rounded-xl border border-input bg-background px-3 text-sm font-mono uppercase text-foreground" />
-                <button onClick={() => { setPremiumCode(premiumCode); setShowPremiumEdit(false); toast.success("Code updated"); }}
+                <button onClick={() => { setPremiumCode(premiumCode); setShowPremiumEdit(false); logActivity("premium_code_update", "Premium unlock code updated"); toast.success("Code updated"); }}
                   className="h-9 px-4 bg-primary text-primary-foreground rounded-xl text-xs font-bold">Save</button>
               </div>
             ) : (
