@@ -330,6 +330,10 @@ const Admin = () => {
   //  RENDER: BATCH INSERT VIEW
   // ═══════════════════════════════════════════════════════
 
+  if (view === "users") {
+    return <AdminUsers onBack={() => setView("dashboard")} />;
+  }
+
   if (view === "batch") {
     const entry = batchEntries[currentBatchIdx];
     const filledCount = batchEntries.filter(e => e.question.trim() && e.options.every(o => o.trim())).length;
