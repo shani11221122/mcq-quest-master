@@ -720,9 +720,9 @@ const Admin = () => {
           {/* Overview cards */}
           <div className="grid grid-cols-4 gap-2">
             {[
-              { icon: BookOpen, label: "Subjects", value: totalStats.subjects },
+              { icon: Users, label: "Users", value: totalStats.users },
               { icon: Database, label: "Total MCQs", value: totalStats.total },
-              { icon: Clock, label: "This Week", value: totalStats.recentlyAdded },
+              { icon: BookOpen, label: "Subjects", value: totalStats.subjects },
               { icon: TrendingUp, label: "Attempts", value: totalStats.quizAttempts },
             ].map(s => {
               const Icon = s.icon;
