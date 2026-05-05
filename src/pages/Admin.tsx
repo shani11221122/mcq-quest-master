@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Plus, Trash2, Pencil, Search, X, Check, ChevronDown,
   Database, Download, Upload, KeyRound, BookOpen, BarChart3,
-  Shield, LogOut, ChevronRight, Layers, Clock, TrendingUp, Eye, EyeOff, UserCog
+  Shield, LogOut, ChevronRight, Layers, Clock, TrendingUp, Eye, EyeOff, UserCog, Users
 } from "lucide-react";
+import AdminUsers from "@/components/AdminUsers";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
 import { getPremiumCode, setPremiumCode } from "@/lib/auth-context";
@@ -28,7 +29,7 @@ type FormData = {
 
 type BatchEntry = FormData;
 
-type View = "dashboard" | "subject" | "batch";
+type View = "dashboard" | "subject" | "batch" | "users";
 
 const emptyForm: FormData = {
   subject: "biology",
@@ -118,11 +119,16 @@ const Admin = () => {
     };
   };
 
+  const totalUsers = (() => {
+    try { return JSON.parse(localStorage.getItem("mdcat_users") || "[]").length; } catch { return 0; }
+  })();
+
   const totalStats = {
     total: questions.length,
     subjects: subjects.length,
     recentlyAdded: questions.filter(q => Date.now() - q.createdAt < 7 * 24 * 60 * 60 * 1000).length,
     quizAttempts: history.length,
+    users: totalUsers,
   };
 
   // ─── Analytics Data ───
@@ -323,6 +329,10 @@ const Admin = () => {
   // ═══════════════════════════════════════════════════════
   //  RENDER: BATCH INSERT VIEW
   // ═══════════════════════════════════════════════════════
+
+  if (view === "users") {
+    return <AdminUsers onBack={() => setView("dashboard")} />;
+  }
 
   if (view === "batch") {
     const entry = batchEntries[currentBatchIdx];
@@ -710,9 +720,9 @@ const Admin = () => {
           {/* Overview cards */}
           <div className="grid grid-cols-4 gap-2">
             {[
-              { icon: BookOpen, label: "Subjects", value: totalStats.subjects },
+              { icon: Users, label: "Users", value: totalStats.users },
               { icon: Database, label: "Total MCQs", value: totalStats.total },
-              { icon: Clock, label: "This Week", value: totalStats.recentlyAdded },
+              { icon: BookOpen, label: "Subjects", value: totalStats.subjects },
               { icon: TrendingUp, label: "Attempts", value: totalStats.quizAttempts },
             ].map(s => {
               const Icon = s.icon;
@@ -766,6 +776,10 @@ const Admin = () => {
           <div>
             <h2 className="text-base font-bold text-foreground mb-3">Quick Actions</h2>
             <div className="flex gap-2 flex-wrap">
+              <button onClick={() => setView("users")}
+                className="flex items-center gap-1.5 bg-primary text-primary-foreground px-4 py-2.5 rounded-xl text-xs font-bold active:scale-95 transition-transform duration-100">
+                <Users size={14} /> Manage Users
+              </button>
               <button onClick={handleSeedDefaults}
                 className="flex items-center gap-1.5 bg-secondary text-secondary-foreground px-4 py-2.5 rounded-xl text-xs font-bold active:scale-95 transition-transform duration-100">
                 <Database size={14} /> Seed Defaults
