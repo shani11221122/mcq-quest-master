@@ -35,8 +35,8 @@ const Login = () => {
         </button>
         <motion.img
           src={puzzleLogo}
-          alt="MDCAT Prep"
-          className="w-28 h-28 object-contain"
+          alt="MDCAT Smart Prep"
+          className="h-28 w-auto max-w-[80%] object-contain"
           initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 400, damping: 20, duration: 0.2 }}
