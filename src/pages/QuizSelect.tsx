@@ -15,12 +15,11 @@ const subjectIcons: Record<string, string> = {
 
 const QuizSelect = () => {
   const navigate = useNavigate();
-  const [difficulty, setDifficulty] = useState<Difficulty | "all">("all");
+  const [difficulty, setDifficulty] = useState<Difficulty>("easy");
   const [search, setSearch] = useState("");
   const [timedMode, setTimedMode] = useState(false);
 
-  const difficulties: { key: Difficulty | "all"; label: string }[] = [
-    { key: "all", label: "All" },
+  const difficulties: { key: Difficulty; label: string }[] = [
     { key: "easy", label: "Easy" },
     { key: "intermediate", label: "Medium" },
     { key: "hard", label: "Hard" },
