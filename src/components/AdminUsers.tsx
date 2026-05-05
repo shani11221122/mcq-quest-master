@@ -6,6 +6,7 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell,
 } from "recharts";
 import { subjects } from "@/lib/quiz-data";
+import { logActivity } from "@/lib/admin-activity";
 
 interface StoredUser {
   username: string;
@@ -150,6 +151,7 @@ export default function AdminUsers({ onBack }: Props) {
         const h = readHistory().map(x => x.username === editingUsername ? { ...x, username } : x);
         writeHistory(h);
       }
+      logActivity("user_update", `Updated user "${editingUsername}"${username !== editingUsername ? ` → "${username}"` : ""}${form.password ? " (password reset)" : ""}${form.isPremium !== !!all[idx].isPremium ? "" : ""}`, { username });
       toast.success("User updated");
     } else {
       if (all.some(u => u.username === username)) { toast.error("Username already exists"); return; }
@@ -159,6 +161,7 @@ export default function AdminUsers({ onBack }: Props) {
       };
       all.push(newUser);
       writeUsers(all);
+      logActivity("user_create", `Created user "${username}"${form.isPremium ? " (premium)" : ""}`, { username, premium: form.isPremium });
       toast.success("User created");
     }
     resetForm();
@@ -172,6 +175,7 @@ export default function AdminUsers({ onBack }: Props) {
     writeHistory(h);
     setDeleteConfirm(null);
     if (detailUser === username) setDetailUser(null);
+    logActivity("user_delete", `Deleted user "${username}"`, { username });
     toast.success("User deleted");
     reload();
   };

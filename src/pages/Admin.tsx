@@ -16,6 +16,8 @@ import {
   importQuestions, migrateFromLocalStorage, type StoredQuestion
 } from "@/lib/indexeddb";
 import { parseQuizJson, buildExportPayload, downloadJson } from "@/lib/quiz-schema";
+import { logActivity } from "@/lib/admin-activity";
+import AdminActivity from "@/components/AdminActivity";
 import { toast } from "sonner";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, PieChart, Pie, Cell } from "recharts";
 
@@ -182,9 +184,11 @@ const Admin = () => {
       if (editingId) {
         const existing = questions.find(q => q.id === editingId)!;
         await updateQuestion({ ...existing, ...form });
+        logActivity("mcq_update", `Updated MCQ in ${form.subject} (${form.difficulty}): "${form.question.slice(0, 60)}${form.question.length > 60 ? "…" : ""}"`, { id: editingId, subject: form.subject });
         toast.success("Question updated");
       } else {
         await addQuestion(form);
+        logActivity("mcq_add", `Added MCQ to ${form.subject} (${form.difficulty}): "${form.question.slice(0, 60)}${form.question.length > 60 ? "…" : ""}"`, { subject: form.subject });
         toast.success("Question added");
       }
       await reload();
@@ -194,7 +198,9 @@ const Admin = () => {
 
   const handleDelete = async (id: string) => {
     try {
+      const q = questions.find(x => x.id === id);
       await deleteQuestion(id);
+      if (q) logActivity("mcq_delete", `Deleted MCQ from ${q.subject} (${q.difficulty}): "${q.question.slice(0, 60)}${q.question.length > 60 ? "…" : ""}"`, { id, subject: q.subject });
       toast.success("Question deleted");
       setDeleteConfirm(null);
       await reload();
@@ -220,6 +226,7 @@ const Admin = () => {
     if (!toImport.length) { toast.info("All default questions already exist"); return; }
     await importQuestions(toImport);
     await reload();
+    logActivity("mcq_seed", `Seeded ${toImport.length} default question${toImport.length !== 1 ? "s" : ""}`, { count: toImport.length });
     toast.success(`Imported ${toImport.length} default questions`);
   };
 
@@ -231,6 +238,7 @@ const Admin = () => {
       const payload = buildExportPayload(all);
       const stamp = new Date().toISOString().replace(/[:.]/g, "-");
       downloadJson(`mdcat_questions_${stamp}.json`, payload);
+      logActivity("mcq_export", `Exported ${all.length} question${all.length !== 1 ? "s" : ""} to JSON`, { count: all.length });
       toast.success(`Exported ${all.length} questions`);
     } catch (e) {
       toast.error(`Export failed: ${(e as Error).message}`);
@@ -260,10 +268,13 @@ const Admin = () => {
           difficulty: q.difficulty,
         })));
         await reload();
+        const fname = file.name;
         if (result.errors.length) {
+          logActivity("mcq_import", `Imported ${result.questions.length} from ${fname} (${result.errors.length} skipped)`, { file: fname, imported: result.questions.length, skipped: result.errors.length });
           toast.warning(`Imported ${result.questions.length}, skipped ${result.errors.length}`);
           console.warn("Skipped rows:", result.errors);
         } else {
+          logActivity("mcq_import", `Imported ${result.questions.length} question${result.questions.length !== 1 ? "s" : ""} from ${fname}`, { file: fname, imported: result.questions.length });
           toast.success(`Imported ${result.questions.length} questions`);
         }
       } catch (err) {
@@ -304,6 +315,7 @@ const Admin = () => {
         await addQuestion(entry);
       }
       await reload();
+      logActivity("mcq_bulk_add", `Bulk added ${valid.length} ${batchSubject} MCQ${valid.length !== 1 ? "s" : ""} (${batchDifficulty})`, { subject: batchSubject, difficulty: batchDifficulty, count: valid.length });
       toast.success(`${valid.length} questions added successfully`);
       setView("subject");
     } catch { toast.error("Failed to save batch"); }
@@ -840,6 +852,9 @@ const Admin = () => {
             </div>
           </div>
 
+          {/* Recent Admin Activity (real-time feed) */}
+          <AdminActivity />
+
           {/* Analytics Charts */}
           {history.length > 0 && (
             <div className="space-y-5">
@@ -935,7 +950,7 @@ const Admin = () => {
               <div className="flex gap-2 mt-3">
                 <input value={premiumCode} onChange={e => setPremiumCodeState(e.target.value)}
                   className="flex-1 h-9 rounded-xl border border-input bg-background px-3 text-sm font-mono uppercase text-foreground" />
-                <button onClick={() => { setPremiumCode(premiumCode); setShowPremiumEdit(false); toast.success("Code updated"); }}
+                <button onClick={() => { setPremiumCode(premiumCode); setShowPremiumEdit(false); logActivity("premium_code_update", "Premium unlock code updated"); toast.success("Code updated"); }}
                   className="h-9 px-4 bg-primary text-primary-foreground rounded-xl text-xs font-bold">Save</button>
               </div>
             ) : (
@@ -1009,6 +1024,8 @@ const Admin = () => {
                     if (credNewPassword && credNewPassword.length < 6) { toast.error("Password must be at least 6 characters"); return; }
                     const success = changeAdminCredentials(credCurrentPass, credNewUsername, credNewPassword);
                     if (success) {
+                      const parts = [credNewUsername && "username", credNewPassword && "password"].filter(Boolean).join(" & ");
+                      logActivity("admin_credentials_update", `Admin ${parts || "credentials"} updated`);
                       toast.success("Credentials updated successfully");
                       setShowCredChange(false);
                     } else {
