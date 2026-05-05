@@ -29,7 +29,7 @@ type FormData = {
 
 type BatchEntry = FormData;
 
-type View = "dashboard" | "subject" | "batch";
+type View = "dashboard" | "subject" | "batch" | "users";
 
 const emptyForm: FormData = {
   subject: "biology",
