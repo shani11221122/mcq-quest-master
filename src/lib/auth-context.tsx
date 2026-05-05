@@ -159,8 +159,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return true;
   };
 
+  const changePassword = (currentPassword: string, newPassword: string): { ok: boolean; error?: string } => {
+    if (!user) return { ok: false, error: "Not signed in" };
+    if (!newPassword || newPassword.length < 8) return { ok: false, error: "New password must be at least 8 characters" };
+    if (!/[A-Za-z]/.test(newPassword) || !/[0-9]/.test(newPassword)) return { ok: false, error: "Use letters and numbers" };
+    if (newPassword === currentPassword) return { ok: false, error: "New password must differ from current" };
+
+    if (user.isAdmin) {
+      const creds = getAdminCreds();
+      if (currentPassword !== creds.password) return { ok: false, error: "Current password is incorrect" };
+      localStorage.setItem(ADMIN_CREDS_KEY, JSON.stringify({ ...creds, password: newPassword }));
+      return { ok: true };
+    }
+
+    const users = JSON.parse(localStorage.getItem("mdcat_users") || "[]");
+    const idx = users.findIndex((u: any) => u.username === user.username);
+    if (idx < 0) return { ok: false, error: "User not found" };
+    if (users[idx].password !== currentPassword) return { ok: false, error: "Current password is incorrect" };
+    users[idx].password = newPassword;
+    localStorage.setItem("mdcat_users", JSON.stringify(users));
+    return { ok: true };
+  };
+
   return (
-    <AuthContext.Provider value={{ user, ready, login, signup, logout, unlockPremium, changeAdminCredentials }}>
+    <AuthContext.Provider value={{ user, ready, login, signup, logout, unlockPremium, changeAdminCredentials, changePassword }}>
       {children}
     </AuthContext.Provider>
   );
