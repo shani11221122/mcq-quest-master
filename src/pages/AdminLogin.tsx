@@ -4,6 +4,7 @@ import { ArrowLeft, Shield, Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
+import adminLogo from "@/assets/logo.jpeg";
 
 const AdminLogin = () => {
   const [username, setUsername] = useState("");
