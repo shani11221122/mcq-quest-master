@@ -6,6 +6,7 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell,
 } from "recharts";
 import { subjects } from "@/lib/quiz-data";
+import { logActivity } from "@/lib/admin-activity";
 
 interface StoredUser {
   username: string;
