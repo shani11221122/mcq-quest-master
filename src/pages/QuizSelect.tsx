@@ -33,7 +33,7 @@ const QuizSelect = () => {
 
   const buildUrl = (subjectId: string) => {
     const params = new URLSearchParams();
-    if (difficulty !== "all") params.set("difficulty", difficulty);
+    params.set("difficulty", difficulty);
     if (timedMode) params.set("timed", "true");
     const qs = params.toString();
     return `/quiz/${subjectId}${qs ? `?${qs}` : ""}`;
