@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Plus, Trash2, Pencil, Search, X, Check, ChevronDown,
   Database, Download, Upload, KeyRound, BookOpen, BarChart3,
-  Shield, LogOut, ChevronRight, Layers, Clock, TrendingUp, Eye, EyeOff, UserCog, Users
+  Shield, LogOut, ChevronRight, Layers, Clock, TrendingUp, Eye, EyeOff, UserCog, Users, Activity
 } from "lucide-react";
 import AdminUsers from "@/components/AdminUsers";
+import AdminMonitoring from "@/components/AdminMonitoring";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
 import { getPremiumCode, setPremiumCode } from "@/lib/auth-context";
@@ -14,6 +15,7 @@ import {
   getAllQuestions, addQuestion, updateQuestion, deleteQuestion,
   importQuestions, migrateFromLocalStorage, type StoredQuestion
 } from "@/lib/indexeddb";
+import { parseQuizJson, buildExportPayload, downloadJson } from "@/lib/quiz-schema";
 import { toast } from "sonner";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, PieChart, Pie, Cell } from "recharts";
 
@@ -29,7 +31,7 @@ type FormData = {
 
 type BatchEntry = FormData;
 
-type View = "dashboard" | "subject" | "batch" | "users";
+type View = "dashboard" | "subject" | "batch" | "users" | "monitoring";
 
 const emptyForm: FormData = {
   subject: "biology",
@@ -221,32 +223,52 @@ const Admin = () => {
     toast.success(`Imported ${toImport.length} default questions`);
   };
 
-  const handleExport = () => {
-    const blob = new Blob([JSON.stringify(questions, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = "mcq_questions.json"; a.click();
-    URL.revokeObjectURL(url);
-    toast.success("Exported successfully");
+  const handleExport = async () => {
+    try {
+      // Always pull the freshest snapshot so "Export All" reflects current DB
+      const all = await getAllQuestions();
+      if (!all.length) { toast.error("No questions to export"); return; }
+      const payload = buildExportPayload(all);
+      const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+      downloadJson(`mdcat_questions_${stamp}.json`, payload);
+      toast.success(`Exported ${all.length} questions`);
+    } catch (e) {
+      toast.error(`Export failed: ${(e as Error).message}`);
+    }
   };
 
   const handleImport = () => {
     const input = document.createElement("input");
-    input.type = "file"; input.accept = ".json";
+    input.type = "file"; input.accept = ".json,application/json";
     input.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
       try {
         const text = await file.text();
-        const parsed = JSON.parse(text) as any[];
-        await importQuestions(parsed.map(q => ({
+        const result = parseQuizJson(text);
+        if (!result.questions.length) {
+          toast.error(result.errors[0] || "No valid questions found");
+          if (result.errors.length > 1) console.warn("Import errors:", result.errors);
+          return;
+        }
+        await importQuestions(result.questions.map(q => ({
           id: q.id || `imp_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-          subject: q.subject, question: q.question, options: q.options,
-          correctAnswer: q.correctAnswer, difficulty: q.difficulty,
+          subject: q.subject,
+          question: q.question,
+          options: q.options,
+          correctAnswer: q.correctAnswer,
+          difficulty: q.difficulty,
         })));
         await reload();
-        toast.success(`Imported ${parsed.length} questions`);
-      } catch { toast.error("Invalid file format"); }
+        if (result.errors.length) {
+          toast.warning(`Imported ${result.questions.length}, skipped ${result.errors.length}`);
+          console.warn("Skipped rows:", result.errors);
+        } else {
+          toast.success(`Imported ${result.questions.length} questions`);
+        }
+      } catch (err) {
+        toast.error(`Import failed: ${(err as Error).message}`);
+      }
     };
     input.click();
   };
@@ -332,6 +354,25 @@ const Admin = () => {
 
   if (view === "users") {
     return <AdminUsers onBack={() => setView("dashboard")} />;
+  }
+
+  if (view === "monitoring") {
+    return (
+      <div className="h-dvh flex flex-col bg-background">
+        <div className="px-5 pt-5 pb-3 flex items-center gap-3 border-b border-border">
+          <button onClick={() => setView("dashboard")} className="p-2 -ml-2 active:scale-95 transition-transform duration-100">
+            <ArrowLeft size={20} />
+          </button>
+          <div className="flex-1">
+            <h1 className="text-base font-bold text-foreground">Live Monitoring</h1>
+            <p className="text-[11px] text-muted-foreground">Online users and activity</p>
+          </div>
+        </div>
+        <div className="flex-1 overflow-y-auto px-5 py-5">
+          <AdminMonitoring />
+        </div>
+      </div>
+    );
   }
 
   if (view === "batch") {
@@ -779,6 +820,10 @@ const Admin = () => {
               <button onClick={() => setView("users")}
                 className="flex items-center gap-1.5 bg-primary text-primary-foreground px-4 py-2.5 rounded-xl text-xs font-bold active:scale-95 transition-transform duration-100">
                 <Users size={14} /> Manage Users
+              </button>
+              <button onClick={() => setView("monitoring")}
+                className="flex items-center gap-1.5 bg-accent text-accent-foreground px-4 py-2.5 rounded-xl text-xs font-bold active:scale-95 transition-transform duration-100">
+                <Activity size={14} /> Live Monitoring
               </button>
               <button onClick={handleSeedDefaults}
                 className="flex items-center gap-1.5 bg-secondary text-secondary-foreground px-4 py-2.5 rounded-xl text-xs font-bold active:scale-95 transition-transform duration-100">
