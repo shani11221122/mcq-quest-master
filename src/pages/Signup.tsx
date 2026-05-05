@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
-import puzzleLogo from "@/assets/puzzle-logo.png";
+import puzzleLogo from "@/assets/logo.jpeg";
 
 const Signup = () => {
   const [username, setUsername] = useState("");
