@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
 import { BookOpen, ClipboardCheck, Trophy, Target, Flame, ChevronRight, Crown, Shield } from "lucide-react";
 import PageShell from "@/components/PageShell";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo.jpeg";
 
 const Home = () => {
   const { user } = useAuth();
@@ -55,9 +55,10 @@ const Home = () => {
 
         <div className="relative px-5 pt-12 pb-8">
           <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <img src={logo} alt="MDCAT Prep" className="w-9 h-9 rounded-xl bg-primary-foreground/10 p-1" />
-              <span className="text-lg font-bold font-display text-primary-foreground">MDCAT Prep</span>
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="h-10 rounded-xl bg-primary-foreground/10 backdrop-blur-sm px-2 py-1 flex items-center justify-center shrink-0">
+                <img src={logo} alt="MDCAT Smart Prep" className="h-full w-auto max-w-[140px] object-contain" />
+              </div>
             </div>
             {user?.isAdmin && (
               <button
