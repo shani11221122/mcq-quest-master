@@ -776,6 +776,10 @@ const Admin = () => {
           <div>
             <h2 className="text-base font-bold text-foreground mb-3">Quick Actions</h2>
             <div className="flex gap-2 flex-wrap">
+              <button onClick={() => setView("users")}
+                className="flex items-center gap-1.5 bg-primary text-primary-foreground px-4 py-2.5 rounded-xl text-xs font-bold active:scale-95 transition-transform duration-100">
+                <Users size={14} /> Manage Users
+              </button>
               <button onClick={handleSeedDefaults}
                 className="flex items-center gap-1.5 bg-secondary text-secondary-foreground px-4 py-2.5 rounded-xl text-xs font-bold active:scale-95 transition-transform duration-100">
                 <Database size={14} /> Seed Defaults
