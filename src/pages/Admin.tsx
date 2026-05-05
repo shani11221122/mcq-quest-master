@@ -119,11 +119,16 @@ const Admin = () => {
     };
   };
 
+  const totalUsers = (() => {
+    try { return JSON.parse(localStorage.getItem("mdcat_users") || "[]").length; } catch { return 0; }
+  })();
+
   const totalStats = {
     total: questions.length,
     subjects: subjects.length,
     recentlyAdded: questions.filter(q => Date.now() - q.createdAt < 7 * 24 * 60 * 60 * 1000).length,
     quizAttempts: history.length,
+    users: totalUsers,
   };
 
   // ─── Analytics Data ───
