@@ -315,6 +315,7 @@ const Admin = () => {
         await addQuestion(entry);
       }
       await reload();
+      logActivity("mcq_bulk_add", `Bulk added ${valid.length} ${batchSubject} MCQ${valid.length !== 1 ? "s" : ""} (${batchDifficulty})`, { subject: batchSubject, difficulty: batchDifficulty, count: valid.length });
       toast.success(`${valid.length} questions added successfully`);
       setView("subject");
     } catch { toast.error("Failed to save batch"); }
