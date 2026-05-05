@@ -18,8 +18,10 @@ export function useQuizTimer({ totalSeconds, initialSeconds, onTimeUp, onTick, e
 
   useEffect(() => {
     if (!enabled) return;
+    const start = initialSeconds ?? totalSeconds;
+    if (start <= 0) return;
     if (!initializedRef.current) {
-      setSecondsLeft(initialSeconds ?? totalSeconds);
+      setSecondsLeft(start);
       initializedRef.current = true;
     }
   }, [totalSeconds, initialSeconds, enabled]);
