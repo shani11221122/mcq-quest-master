@@ -226,6 +226,7 @@ const Admin = () => {
     if (!toImport.length) { toast.info("All default questions already exist"); return; }
     await importQuestions(toImport);
     await reload();
+    logActivity("mcq_seed", `Seeded ${toImport.length} default question${toImport.length !== 1 ? "s" : ""}`, { count: toImport.length });
     toast.success(`Imported ${toImport.length} default questions`);
   };
 
