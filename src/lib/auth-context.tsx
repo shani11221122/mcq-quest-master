@@ -153,7 +153,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (user?.isAdmin) {
       const updatedUser = { ...user, username: updated.username };
       setUser(updatedUser);
-      localStorage.setItem("mdcat_user", JSON.stringify(updatedUser));
+      persistSession(updatedUser);
     }
     return true;
   };
