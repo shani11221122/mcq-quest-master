@@ -117,7 +117,7 @@ const Settings = () => {
         <div className="mb-6">
           <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-1">Account</h2>
           <div className="glass-card overflow-hidden divide-y divide-border/50">
-            <button className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-muted/50 transition-colors duration-100">
+            <button onClick={() => setPwOpen(true)} className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-muted/50 transition-colors duration-100">
               <KeyRound size={18} className="text-muted-foreground" />
               <span className="flex-1 text-left text-sm font-medium text-foreground">Change Password</span>
               <ChevronRight size={16} className="text-muted-foreground" />
