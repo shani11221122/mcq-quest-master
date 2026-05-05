@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import puzzleLogo from "@/assets/puzzle-logo.png";
+import puzzleLogo from "@/assets/logo.jpeg";
 import { useAuth } from "@/lib/auth-context";
 
 const Index = () => {
@@ -20,20 +20,12 @@ const Index = () => {
     <div className="min-h-screen flex flex-col items-center justify-center bg-background px-6">
       <motion.img
         src={puzzleLogo}
-        alt="MDCAT Prep"
-        className="w-32 h-32 mb-8"
+        alt="MDCAT Smart Prep"
+        className="h-36 w-auto max-w-[85%] object-contain mb-6"
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: "spring", stiffness: 400, damping: 20, duration: 0.2 }}
       />
-      <motion.h1
-        className="text-3xl font-extrabold text-foreground mb-2 text-center"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.15, delay: 0.05 }}
-      >
-        MDCAT Prep
-      </motion.h1>
       <motion.p
         className="text-muted-foreground text-center mb-10"
         initial={{ opacity: 0 }}

@@ -79,12 +79,12 @@ const AdminLogin = () => {
           </button>
 
           <motion.div
-            className="w-20 h-20 rounded-2xl bg-primary-foreground/15 backdrop-blur-sm flex items-center justify-center mb-4"
+            className="h-20 rounded-2xl bg-primary-foreground/15 backdrop-blur-sm flex items-center justify-center px-3 py-2 mb-4"
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", stiffness: 400, damping: 20 }}
           >
-            <Shield size={40} className="text-primary-foreground" />
+            <img src={adminLogo} alt="MDCAT Smart Prep" className="h-full w-auto max-w-[160px] object-contain" />
           </motion.div>
 
           <motion.div
