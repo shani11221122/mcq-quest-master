@@ -268,10 +268,13 @@ const Admin = () => {
           difficulty: q.difficulty,
         })));
         await reload();
+        const fname = file.name;
         if (result.errors.length) {
+          logActivity("mcq_import", `Imported ${result.questions.length} from ${fname} (${result.errors.length} skipped)`, { file: fname, imported: result.questions.length, skipped: result.errors.length });
           toast.warning(`Imported ${result.questions.length}, skipped ${result.errors.length}`);
           console.warn("Skipped rows:", result.errors);
         } else {
+          logActivity("mcq_import", `Imported ${result.questions.length} question${result.questions.length !== 1 ? "s" : ""} from ${fname}`, { file: fname, imported: result.questions.length });
           toast.success(`Imported ${result.questions.length} questions`);
         }
       } catch (err) {
