@@ -175,6 +175,7 @@ export default function AdminUsers({ onBack }: Props) {
     writeHistory(h);
     setDeleteConfirm(null);
     if (detailUser === username) setDetailUser(null);
+    logActivity("user_delete", `Deleted user "${username}"`, { username });
     toast.success("User deleted");
     reload();
   };
