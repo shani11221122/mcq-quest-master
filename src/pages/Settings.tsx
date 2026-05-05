@@ -26,12 +26,48 @@ const rules = [
 
 const Settings = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, changePassword } = useAuth();
   const { theme, setTheme } = useTheme();
+
+  const [pwOpen, setPwOpen] = useState(false);
+  const [current, setCurrent] = useState("");
+  const [next, setNext] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNext, setShowNext] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const resetPwForm = () => {
+    setCurrent(""); setNext(""); setConfirm("");
+    setShowCurrent(false); setShowNext(false);
+  };
 
   const handleLogout = () => {
     logout();
     navigate("/login");
+  };
+
+  const handleChangePassword = async () => {
+    if (!current || !next || !confirm) {
+      toast.error("Please fill all fields");
+      return;
+    }
+    if (next !== confirm) {
+      toast.error("New passwords do not match");
+      return;
+    }
+    setSubmitting(true);
+    // simulate API latency for UX
+    await new Promise((r) => setTimeout(r, 400));
+    const res = changePassword(current, next);
+    setSubmitting(false);
+    if (!res.ok) {
+      toast.error(res.error || "Failed to change password");
+      return;
+    }
+    toast.success("Password updated successfully");
+    resetPwForm();
+    setPwOpen(false);
   };
 
   return (
