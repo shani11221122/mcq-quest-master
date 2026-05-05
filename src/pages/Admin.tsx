@@ -852,6 +852,9 @@ const Admin = () => {
             </div>
           </div>
 
+          {/* Recent Admin Activity (real-time feed) */}
+          <AdminActivity />
+
           {/* Analytics Charts */}
           {history.length > 0 && (
             <div className="space-y-5">
