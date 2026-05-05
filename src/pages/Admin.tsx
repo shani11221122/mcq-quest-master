@@ -238,6 +238,7 @@ const Admin = () => {
       const payload = buildExportPayload(all);
       const stamp = new Date().toISOString().replace(/[:.]/g, "-");
       downloadJson(`mdcat_questions_${stamp}.json`, payload);
+      logActivity("mcq_export", `Exported ${all.length} question${all.length !== 1 ? "s" : ""} to JSON`, { count: all.length });
       toast.success(`Exported ${all.length} questions`);
     } catch (e) {
       toast.error(`Export failed: ${(e as Error).message}`);
