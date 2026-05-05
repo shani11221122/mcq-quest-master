@@ -81,10 +81,12 @@ export function getPremiumCode(): string {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem("mdcat_user");
-    if (saved) setUser(JSON.parse(saved));
+    const restored = loadSession();
+    if (restored) setUser(restored);
+    setReady(true);
   }, []);
 
   const login = (username: string, password: string): boolean => {
@@ -93,14 +95,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (found) {
       const userData: User = { username: found.username, email: found.email, isAdmin: found.isAdmin || false, isPremium: found.isPremium || false };
       setUser(userData);
-      localStorage.setItem("mdcat_user", JSON.stringify(userData));
+      persistSession(userData);
       return true;
     }
     const adminCreds = getAdminCreds();
     if (username === adminCreds.username && password === adminCreds.password) {
       const userData: User = { username: adminCreds.username, email: "admin@mdcat.com", isAdmin: true, isPremium: true };
       setUser(userData);
-      localStorage.setItem("mdcat_user", JSON.stringify(userData));
+      persistSession(userData);
       return true;
     }
     return false;
@@ -113,12 +115,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("mdcat_users", JSON.stringify(users));
     const userData: User = { username, email, isAdmin: false, isPremium: false };
     setUser(userData);
-    localStorage.setItem("mdcat_user", JSON.stringify(userData));
+    persistSession(userData);
     return true;
   };
 
   const logout = () => {
     setUser(null);
+    localStorage.removeItem(SESSION_KEY);
     localStorage.removeItem("mdcat_user");
   };
 
