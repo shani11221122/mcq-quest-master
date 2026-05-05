@@ -143,6 +143,72 @@ const Settings = () => {
           </div>
         </div>
       </div>
+
+      <Dialog open={pwOpen} onOpenChange={(o) => { setPwOpen(o); if (!o) resetPwForm(); }}>
+        <DialogContent className="max-w-sm rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>Change Password</DialogTitle>
+            <DialogDescription>
+              Enter your current password and choose a new one. Min 8 characters with letters and numbers.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3 py-2">
+            <div className="relative">
+              <input
+                type={showCurrent ? "text" : "password"}
+                value={current}
+                onChange={(e) => setCurrent(e.target.value)}
+                placeholder="Current password"
+                className="w-full h-11 px-4 pr-10 rounded-xl bg-muted border border-border text-sm outline-none focus:ring-2 focus:ring-primary"
+                autoComplete="current-password"
+              />
+              <button type="button" onClick={() => setShowCurrent(!showCurrent)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                {showCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+            <div className="relative">
+              <input
+                type={showNext ? "text" : "password"}
+                value={next}
+                onChange={(e) => setNext(e.target.value)}
+                placeholder="New password"
+                className="w-full h-11 px-4 pr-10 rounded-xl bg-muted border border-border text-sm outline-none focus:ring-2 focus:ring-primary"
+                autoComplete="new-password"
+              />
+              <button type="button" onClick={() => setShowNext(!showNext)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                {showNext ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+            <input
+              type={showNext ? "text" : "password"}
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              placeholder="Confirm new password"
+              className="w-full h-11 px-4 rounded-xl bg-muted border border-border text-sm outline-none focus:ring-2 focus:ring-primary"
+              autoComplete="new-password"
+            />
+          </div>
+
+          <DialogFooter className="flex-row gap-2">
+            <button
+              onClick={() => setPwOpen(false)}
+              disabled={submitting}
+              className="flex-1 h-11 rounded-xl bg-muted text-sm font-semibold text-foreground hover:bg-muted/70 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleChangePassword}
+              disabled={submitting}
+              className="flex-1 h-11 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              {submitting && <Loader2 size={14} className="animate-spin" />}
+              Update
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </PageShell>
   );
 };
