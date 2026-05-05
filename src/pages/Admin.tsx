@@ -223,32 +223,52 @@ const Admin = () => {
     toast.success(`Imported ${toImport.length} default questions`);
   };
 
-  const handleExport = () => {
-    const blob = new Blob([JSON.stringify(questions, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = "mcq_questions.json"; a.click();
-    URL.revokeObjectURL(url);
-    toast.success("Exported successfully");
+  const handleExport = async () => {
+    try {
+      // Always pull the freshest snapshot so "Export All" reflects current DB
+      const all = await getAllQuestions();
+      if (!all.length) { toast.error("No questions to export"); return; }
+      const payload = buildExportPayload(all);
+      const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+      downloadJson(`mdcat_questions_${stamp}.json`, payload);
+      toast.success(`Exported ${all.length} questions`);
+    } catch (e) {
+      toast.error(`Export failed: ${(e as Error).message}`);
+    }
   };
 
   const handleImport = () => {
     const input = document.createElement("input");
-    input.type = "file"; input.accept = ".json";
+    input.type = "file"; input.accept = ".json,application/json";
     input.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
       try {
         const text = await file.text();
-        const parsed = JSON.parse(text) as any[];
-        await importQuestions(parsed.map(q => ({
+        const result = parseQuizJson(text);
+        if (!result.questions.length) {
+          toast.error(result.errors[0] || "No valid questions found");
+          if (result.errors.length > 1) console.warn("Import errors:", result.errors);
+          return;
+        }
+        await importQuestions(result.questions.map(q => ({
           id: q.id || `imp_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-          subject: q.subject, question: q.question, options: q.options,
-          correctAnswer: q.correctAnswer, difficulty: q.difficulty,
+          subject: q.subject,
+          question: q.question,
+          options: q.options,
+          correctAnswer: q.correctAnswer,
+          difficulty: q.difficulty,
         })));
         await reload();
-        toast.success(`Imported ${parsed.length} questions`);
-      } catch { toast.error("Invalid file format"); }
+        if (result.errors.length) {
+          toast.warning(`Imported ${result.questions.length}, skipped ${result.errors.length}`);
+          console.warn("Skipped rows:", result.errors);
+        } else {
+          toast.success(`Imported ${result.questions.length} questions`);
+        }
+      } catch (err) {
+        toast.error(`Import failed: ${(err as Error).message}`);
+      }
     };
     input.click();
   };
