@@ -16,6 +16,8 @@ import {
   importQuestions, migrateFromLocalStorage, type StoredQuestion
 } from "@/lib/indexeddb";
 import { parseQuizJson, buildExportPayload, downloadJson } from "@/lib/quiz-schema";
+import { logActivity } from "@/lib/admin-activity";
+import AdminActivity from "@/components/AdminActivity";
 import { toast } from "sonner";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, PieChart, Pie, Cell } from "recharts";
 
