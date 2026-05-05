@@ -51,6 +51,7 @@ interface AuthContextType {
   logout: () => void;
   unlockPremium: (code: string) => boolean;
   changeAdminCredentials: (currentPassword: string, newUsername: string, newPassword: string) => boolean;
+  changePassword: (currentPassword: string, newPassword: string) => { ok: boolean; error?: string };
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
